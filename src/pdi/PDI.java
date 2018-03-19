@@ -96,6 +96,25 @@ public class PDI {
         Imagen.setImagenTemporal(img);
         return img;
     }
+    
+    public BufferedImage FotoRotacion(BufferedImage img)
+    {
+        Imagen.setImagen(img);
+        
+        height = img.getHeight();
+        width = img.getWidth();
+        
+        BufferedImage rotatedImage = new BufferedImage(height,width,img.getType());
+        for (int w=0;w<width;w++) 
+        {
+            for (int h=0;h<height;h++) 
+            {
+                rotatedImage.setRGB(h,width-w-1,img.getRGB(w,h));
+            }
+        }
+        Imagen.setImagenTemporal(rotatedImage);
+        return rotatedImage;
+    }
     /**
      * @param args the command line arguments
      */
@@ -104,7 +123,6 @@ public class PDI {
         Frame vista = new Frame();
 
         vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        vista.setSize(200, 200);
         vista.setVisible(true);
     }
 
