@@ -161,11 +161,13 @@ public class Frame extends javax.swing.JFrame {
     private void opcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opcionActionPerformed
         String caso = opcion.getSelectedItem().toString().toLowerCase(); // Obtengo la opción del combo box.
         PDI controlador = new PDI();
+        BufferedImage img;
+        Image imagenFinal;
         switch(caso)
         {
             case "negativo":
-                BufferedImage img = controlador.fotoNegativa(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                Image imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                img = controlador.FotoNegativa(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                 imagen.setIcon(new ImageIcon(imagenFinal));
                 Cuadro.add(imagen);
                 break;
@@ -173,7 +175,10 @@ public class Frame extends javax.swing.JFrame {
                     System.out.println("grises");
                 break;
                 case "blanco y negro":
-                    System.out.println("bn");
+                img = controlador.FotoBlancoNegro(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
                 break;
                 case "colores únicos":
                     System.out.println("coloresunicos");
