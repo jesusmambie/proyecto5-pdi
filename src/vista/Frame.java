@@ -143,7 +143,7 @@ public class Frame extends javax.swing.JFrame {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
             Imagen imagenModelo = new Imagen();
-            imagenModelo.setImagen(imagenFinal); // Se guarda la imagen en el modelo
+            imagenModelo.setImagen(img); // Se guarda la imagen en el modelo
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
             Cuadro.setVisible(true);
@@ -164,7 +164,10 @@ public class Frame extends javax.swing.JFrame {
         switch(caso)
         {
             case "negativo":
-                controlador.fotoNegativa(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                BufferedImage img = controlador.fotoNegativa(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                Image imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
                 break;
                 case "escala de grises":
                     System.out.println("grises");

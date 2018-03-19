@@ -4,22 +4,22 @@
  * and open the template in the editor.
  */
 package modelo;
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 /**
  *
  * @author AnthonyLA
  */
 public class Imagen {
     
-    private static Image imagenFinal;
+    private static BufferedImage imagenFinal;
     
     
-    public Image getImagen()
+    public BufferedImage getImagen()
     {
         return this.imagenFinal;
     }
     
-    public void setImagen(Image imagenFinal)
+    public void setImagen(BufferedImage imagenFinal)
     {
         this.imagenFinal = imagenFinal;
     }

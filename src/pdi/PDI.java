@@ -5,7 +5,7 @@
  */
 package pdi;
 
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import vista.Frame;
@@ -16,10 +16,35 @@ import vista.Frame;
  */
 public class PDI {
 
-    
-    public void fotoNegativa(Image img)
+    // Vuelve la imagen negativa.
+    public BufferedImage fotoNegativa(BufferedImage img)
     {
-        System.out.println("grises");
+        int height = img.getHeight();
+        int width = img.getWidth();
+        
+        int red;
+        int green;
+        int blue;
+        
+        for (int h = 0; h<height; h++)
+        {
+            for (int w = 0; w<width; w++)
+            {
+                int pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                red = 255 - red;
+                green = 255 - green;
+                blue = 255 -  blue;
+                
+                pixel =  (red<<16) | (green<<8) | blue;
+                
+                img.setRGB(w, h, pixel);
+            }
+        }
+        return (img);
     }
     
     /**
