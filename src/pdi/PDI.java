@@ -16,14 +16,12 @@ import vista.Frame;
  */
 public class PDI {
 
-    public ImageIcon ResizeImage(String path, javax.swing.JLabel labelImagen) {
-        ImageIcon MyImage = new ImageIcon(path);
-        Image img = MyImage.getImage();
-        Image newImg = img.getScaledInstance(labelImagen.getWidth(), labelImagen.getHeight(), Image.SCALE_SMOOTH);
-        ImageIcon image = new ImageIcon(newImg);
-        return image;
+    
+    public void fotoNegativa(Image img)
+    {
+        System.out.println("grises");
     }
-
+    
     /**
      * @param args the command line arguments
      */
