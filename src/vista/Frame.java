@@ -181,7 +181,8 @@ public class Frame extends javax.swing.JFrame {
                 Cuadro.add(imagen);
                 break;
                 case "colores únicos":
-                    System.out.println("coloresunicos");
+                    int cont = controlador.FotoColoresUnicos(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                    System.out.print(cont);
                 break;
                 case "rotacion":
                     img = controlador.FotoRotacion(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
