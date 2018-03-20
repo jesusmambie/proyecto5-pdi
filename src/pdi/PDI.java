@@ -6,6 +6,9 @@
 package pdi;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import modelo.Imagen;
@@ -92,9 +95,36 @@ public class PDI {
                 img.setRGB(w, h, pixel);
             }
         }
-        
+        System.out.print(pixel);
         Imagen.setImagenTemporal(img);
         return img;
+    }
+    
+    // Cuenta colores unicos
+    public int FotoColoresUnicos(BufferedImage img)
+    {
+        Set<Integer> pixels = new HashSet<>();
+        int cont = 0;
+        Imagen.setImagen(img);
+        
+        final int BLACK = 0;
+        final int WHITE = 255;
+        
+        height = img.getHeight();
+        width = img.getWidth();
+        
+        for(int h=0; h<height; h++)
+        {
+            for(int w=0; w<width; w++)
+            {
+                pixel = img.getRGB(w, h);
+                if (!pixels.contains(pixel)) {
+                    pixels.add(pixel);
+                }
+            }
+        }
+        
+        return pixels.size();
     }
     /**
      * @param args the command line arguments
@@ -104,7 +134,6 @@ public class PDI {
         Frame vista = new Frame();
 
         vista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        vista.setSize(200, 200);
         vista.setVisible(true);
     }
 

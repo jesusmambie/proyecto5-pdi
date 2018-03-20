@@ -109,11 +109,11 @@ public class Frame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jToggleButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(3, 3, 3)
-                        .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jToggleButton1))
                 .addGap(83, 83, 83))
         );
 
@@ -181,7 +181,8 @@ public class Frame extends javax.swing.JFrame {
                 Cuadro.add(imagen);
                 break;
                 case "colores únicos":
-                    System.out.println("coloresunicos");
+                    int cont = controlador.FotoColoresUnicos(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                    System.out.print(cont);
                 break;
                 default:
                     System.out.println("defecto");
