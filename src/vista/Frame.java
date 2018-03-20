@@ -82,7 +82,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotacion" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -109,11 +109,11 @@ public class Frame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jToggleButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(3, 3, 3)
-                        .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jToggleButton1))
                 .addGap(83, 83, 83))
         );
 
@@ -182,6 +182,12 @@ public class Frame extends javax.swing.JFrame {
                 break;
                 case "colores únicos":
                     System.out.println("coloresunicos");
+                break;
+                case "rotacion":
+                    img = controlador.FotoRotacion(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
                 break;
                 default:
                     System.out.println("defecto");
