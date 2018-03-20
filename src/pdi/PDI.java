@@ -26,6 +26,7 @@ public class PDI {
     private int red;
     private int green;
     private int blue;
+    private int gray;
     
     private int pixel;
     // Convierte la imagen negativa.
@@ -50,6 +51,34 @@ public class PDI {
                 blue = 255 -  blue;
                 
                 pixel =  (red<<16) | (green<<8) | blue;
+                
+                img.setRGB(w, h, pixel);
+            }
+        }
+        Imagen.setImagenTemporal(img);
+        return (img);
+    }
+    
+    //Convierte la imagen a escala de grises
+    public BufferedImage FotoEscalaGrises(BufferedImage img)
+    {
+        Imagen.setImagen(img);
+        
+        height = img.getHeight();
+        width = img.getWidth();
+        
+        for (int h = 0; h<height; h++)
+        {
+            for (int w = 0; w<width; w++)
+            {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                gray = (red + green + blue)/3;
+                
+                pixel =  (gray<<16) | (gray<<8) | gray;
                 
                 img.setRGB(w, h, pixel);
             }
