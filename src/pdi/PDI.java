@@ -155,9 +155,6 @@ public class PDI {
         int cont = 0;
         Imagen.setImagen(img);
         
-        final int BLACK = 0;
-        final int WHITE = 255;
-        
         height = img.getHeight();
         width = img.getWidth();
         
@@ -171,7 +168,7 @@ public class PDI {
                 }
             }
         }
-        
+        System.out.println(cont);
         return pixels.size();
     }
     /**

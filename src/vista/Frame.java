@@ -48,7 +48,6 @@ public class Frame extends javax.swing.JFrame {
         imagen = new javax.swing.JLabel();
         jToggleButton1 = new javax.swing.JToggleButton();
         opcion = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,7 +60,7 @@ public class Frame extends javax.swing.JFrame {
             .addGroup(CuadroLayout.createSequentialGroup()
                 .addGap(196, 196, 196)
                 .addComponent(imagen, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(205, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         CuadroLayout.setVerticalGroup(
             CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -83,17 +82,10 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotacion" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("Cancelar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
             }
         });
 
@@ -102,13 +94,11 @@ public class Frame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(140, 140, 140)
+                .addGap(247, 247, 247)
                 .addComponent(jToggleButton1)
-                .addGap(34, 34, 34)
-                .addComponent(opcion, 0, 159, Short.MAX_VALUE)
-                .addGap(26, 26, 26)
-                .addComponent(jButton1)
-                .addGap(133, 133, 133))
+                .addGap(87, 87, 87)
+                .addComponent(opcion, 0, 163, Short.MAX_VALUE)
+                .addGap(69, 69, 69))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -119,10 +109,9 @@ public class Frame extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(3, 3, 3)
-                        .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(3, 3, 3)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton1))
                 .addGap(83, 83, 83))
         );
@@ -194,11 +183,12 @@ public class Frame extends javax.swing.JFrame {
                     Cuadro.add(imagen);
                 break;
                 case "colores únicos":
-                    int cont = controlador.FotoColoresUnicos(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                    System.out.print(cont);
+                    controlador.FotoColoresUnicos(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
                 break;
-                case "rotacion":
-                    img = controlador.FotoRotacion(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
+                case "rotación":
+                    BufferedImage imgTemp;
+                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagen()) : (Imagen.getImagenTemporal());
+                    img = controlador.FotoRotacion(imgTemp);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
@@ -251,7 +241,6 @@ public class Frame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Cuadro;
     private javax.swing.JLabel imagen;
-    private javax.swing.JButton jButton1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JComboBox<String> opcion;
     // End of variables declaration//GEN-END:variables
