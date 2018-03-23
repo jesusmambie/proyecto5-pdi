@@ -84,7 +84,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación", "Compresión RLE" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -240,6 +240,10 @@ public class Frame extends javax.swing.JFrame {
                 imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                 imagen.setIcon(new ImageIcon(imagenFinal));
                 Cuadro.add(imagen);
+            break;
+            case "compresión rle":
+                String format = "pbm";
+                controlador.CompresionRLE(img, format);
             break;
             default:
                 System.out.println("defecto");

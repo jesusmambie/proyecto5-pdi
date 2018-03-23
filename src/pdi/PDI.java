@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.*;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import modelo.Imagen;
 import static sun.security.krb5.Confounder.bytes;
 import vista.Frame;
+import java.util.Arrays;
 
 /**
  *
@@ -254,6 +255,76 @@ public class PDI {
         }
         System.out.println(pixels.size());
         return pixels.size();
+    }
+    
+    //Hace la compresion RLE
+    public void CompresionRLE(BufferedImage img, String format)
+    {
+        int cont, width, height;
+        int[][] mat = new int[2][2];
+        ArrayList<Integer> compress=new ArrayList<>(); 
+        switch (format) {
+            case "pbm" :
+            cont = 1;
+            width = 1; 
+            height = 1;
+            mat[0][0] = 0;
+            mat[1][0] = 0;
+            mat[0][1] = 1;
+            mat[1][1] = 1;
+
+            for (int h=0; h<height+1; h++) {
+                for(int w=1; w<=width+1; w++)
+                {
+                        if ((w!=width+1) && (mat[w-1][h] == mat[w][h])) {
+                            cont++;
+                        }else{
+                            compress.add(cont);
+                            compress.add(mat[w-1][h]);
+                            cont = 1;
+                        }
+                }
+            }
+
+                for (Integer s : compress) {  //aca hay q poner a escribir en archivo
+                    System.out.print(s);
+                }
+            break;
+            
+            //si es formato pgm (grayscale)
+            case "pgm" :
+            cont = 1;
+            width = 1; 
+            height = 1;
+            mat[0][0] = 0;
+            mat[1][0] = 0;
+            mat[0][1] = 1;
+            mat[1][1] = 1;
+
+            for (int h=0; h<height+1; h++) {
+                for(int w=1; w<=width+1; w++)
+                {
+                        if ((w!=width+1) && (mat[w-1][h] == mat[w][h])) {
+                            cont++;
+                        }else{
+                            compress.add(cont);
+                            compress.add(mat[w-1][h]);
+                            cont = 1;
+                        }
+                }
+            }
+
+                for (Integer s : compress) {  //aca hay q poner a escribir en archivo
+                    System.out.print(s);
+                }
+            break;
+            
+            //si es formato ppm (color)
+            case "ppm":
+            for(int h=0; h<10; h++)
+            
+            break;
+        }
     }
     
     // Lee un byte.
