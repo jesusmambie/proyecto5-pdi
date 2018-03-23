@@ -9,8 +9,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -156,15 +161,15 @@ public class PDI {
                 ImageIO.write(imagenNegativa, "BMP", new File("imagenNegativa.bmp"));
                 break;
                 
-            // Guardar imagen escala de grises.
+                // Guardar imagen escala de grises.
             case 1:
                 BufferedImage imagenGris = new BufferedImage(imagenGuardar.getWidth(),imagenGuardar.getHeight(),BufferedImage.TYPE_BYTE_GRAY);
                 Graphics2D graphics = imagenGris.createGraphics();
                 graphics.drawImage(imagenGuardar, 0, 0, null);
                 ImageIO.write(imagenGris, "BMP", new File("imagenEscalaGrises.bmp"));
                 break;
-            
-            // Guardar imagen blanco y negro.    
+                
+                // Guardar imagen blanco y negro.
             case 2:
                 BufferedImage img = Imagen.getImagenOrinal();
                 final int BLACK = 0;
@@ -249,6 +254,85 @@ public class PDI {
         }
         System.out.println(pixels.size());
         return pixels.size();
+    }
+    
+    // Lee un byte.
+    private static int LeerByte( InputStream in ) throws IOException
+    {
+        int b = in.read();
+        if ( b == -1 )
+            throw new EOFException();
+        return b;
+    }
+    
+    // Lee caracteres de un archivo netbmp ignorando espacios.
+    private static char LeerCaracter( InputStream archivo ) throws IOException{
+        char c;
+        c = (char) LeerByte( archivo );
+        if ( c == '#' )
+        {
+            do
+            {
+                c = (char) LeerByte( archivo );
+            }
+            while ( c != '\n' && c != '\r' );
+        }
+        return c;
+    }
+    
+    // Lectura de todas las imágines Netbmp.
+    public BufferedImage Netbmp(String tipoNetbmp, String ruta) throws FileNotFoundException, IOException
+    {
+        BufferedImage img = null;
+//                new BufferedImage(0, 0, BufferedImage.TYPE_BYTE_GRAY);
+        InputStream entrada = new FileInputStream(ruta);
+        int rgb = 0;        // Almacenará el color.
+        char c;             // Representa 1 caracter del archivo.
+        ArrayList<Integer> indices = new ArrayList<Integer>();
+        int i = entrada.read();
+        // Leo buscando los índices.
+        while(i != -1)
+        {
+            c = LeerCaracter(entrada);
+            // CONDICIONES PARA SABER LOS INDICES.
+        }
+        
+        width = indices.get(0);     // Indice ancho.
+        height = indices.get(1);    // Indice largo.
+        
+        switch(tipoNetbmp.toLowerCase())
+        {
+            case "ppm":
+                
+                break;
+            case "pgm":
+                break;
+            case "pbm":
+                for(int h=0; h<height; h++)
+                {
+                    for(int w=0; w<width; w++)
+                    {
+                        c = LeerCaracter( entrada );
+                        if ( c == '1' )
+                        {
+                            rgb = 0xff000000;
+                            pixel = (rgb << 16) | (rgb << 8) | rgb ;
+                            img.setRGB(w, h, pixel);
+                        }            
+                        else if ( c == '0' )
+                        {
+                            rgb = 0xffffffff;
+                            pixel = (rgb << 16) | (rgb << 8) | rgb ;
+                            img.setRGB(w, h, pixel);
+                        }
+                        else
+                            throw new IOException( "bit no válido" );
+                    }
+                }
+                break;
+        }
+        Imagen.setImagenTemporal(img);
+        return (img);
     }
     /**
      * @param args the command line arguments

@@ -141,13 +141,24 @@ public class Frame extends javax.swing.JFrame {
         int result = file.showSaveDialog(null);
         
         if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = file.getSelectedFile();
-            String path = selectedFile.getAbsolutePath();
+            
             BufferedImage img = null;
             Image imagenFinal = null;
+            File selectedFile = file.getSelectedFile();
+            String path = selectedFile.getAbsolutePath();
+            int tamannoExt = path.length();
+            String ext = path.substring(tamannoExt-3); // Se lee la extensión.
+            
+            // Si se carga una imagen netbmp se trata de otra forma.
+            if(ext!="bmp") try {
+                img = pdi.Netbmp(ext, path);            // Buffer de la imagen Netbmp.
+            } catch (IOException ex) {
+                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
             try {
                 URL url = new File(path).toURI().toURL();
-                img = ImageIO.read(url);
+                if (img == null) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
                 imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
