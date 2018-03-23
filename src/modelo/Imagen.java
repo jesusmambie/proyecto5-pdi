@@ -13,22 +13,30 @@ public class Imagen {
     
     private static BufferedImage imagenOrinal;
     private static BufferedImage imagenTemporal;
-        
-    public static BufferedImage getImagen()
-    {
-        return Imagen.imagenOrinal;
-    }
+    private static boolean[] tipoGuardado = new boolean[3];
+
     
-    public static void setImagen(BufferedImage imagenFinal)
-    {
-        Imagen.imagenOrinal = imagenFinal;
+    public static BufferedImage getImagenOrinal() {
+        return imagenOrinal;
     }
-    
+
+    public static void setImagenOrinal(BufferedImage imagenOrinal) {
+        Imagen.imagenOrinal = imagenOrinal;
+    }
+              
     public static void setImagenTemporal(BufferedImage imagenTemporal) {
         Imagen.imagenTemporal = imagenTemporal;
     }
 
     public static BufferedImage getImagenTemporal() {
         return imagenTemporal;
+    }
+    
+    public static boolean[] getTipoGuardado() {
+        return tipoGuardado;
+    }
+
+    public static void setTipoGuardado(boolean[] tipoGuardado) {
+        Imagen.tipoGuardado = tipoGuardado;
     }
 }

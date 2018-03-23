@@ -5,6 +5,7 @@
  */
 package vista;
 
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -48,6 +49,7 @@ public class Frame extends javax.swing.JFrame {
         imagen = new javax.swing.JLabel();
         jToggleButton1 = new javax.swing.JToggleButton();
         opcion = new javax.swing.JComboBox<>();
+        guardarImagen = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,10 +84,17 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
+            }
+        });
+
+        guardarImagen.setText("Guardar");
+        guardarImagen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                guardarImagenActionPerformed(evt);
             }
         });
 
@@ -94,10 +103,12 @@ public class Frame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(247, 247, 247)
+                .addGap(164, 164, 164)
+                .addComponent(guardarImagen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToggleButton1)
                 .addGap(87, 87, 87)
-                .addComponent(opcion, 0, 163, Short.MAX_VALUE)
+                .addComponent(opcion, 0, 165, Short.MAX_VALUE)
                 .addGap(69, 69, 69))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
@@ -112,7 +123,8 @@ public class Frame extends javax.swing.JFrame {
                 .addGap(3, 3, 3)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleButton1))
+                    .addComponent(jToggleButton1)
+                    .addComponent(guardarImagen))
                 .addGap(83, 83, 83))
         );
 
@@ -120,6 +132,7 @@ public class Frame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        
         JFileChooser file = new JFileChooser();
         file.setCurrentDirectory(new File(System.getProperty("user.home")));
         
@@ -141,8 +154,7 @@ public class Frame extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Imagen imagenModelo = new Imagen();
-            imagenModelo.setImagen(img); // Se guarda la imagen en el modelo
+            Imagen.setImagenOrinal(img); // Se guarda la imagen en el modelo
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
             Cuadro.setVisible(true);
@@ -160,48 +172,78 @@ public class Frame extends javax.swing.JFrame {
     private void opcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opcionActionPerformed
         String caso = opcion.getSelectedItem().toString().toLowerCase(); // Obtengo la opción del combo box.
         PDI controlador = new PDI();
-        BufferedImage img;
+        BufferedImage img = null;
         Image imagenFinal;
+        boolean[] tipoGuardado = {false,false,false};
         switch(caso)
         {
+            case "original":
+                img = Imagen.getImagenOrinal();
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+            break;
             case "negativo":
-                    img = controlador.FotoNegativa(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                break;
-                case "escala de grises":
-                    img = controlador.FotoEscalaGrises(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                break;
-                case "blanco y negro":
-                    img = controlador.FotoBlancoNegro(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                break;
-                case "colores únicos":
-                    controlador.FotoColoresUnicos(new Imagen().getImagen()); // Se accede a la imagen desde el modelo.
-                break;
-                case "rotación":
-                    BufferedImage imgTemp;
-                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagen()) : (Imagen.getImagenTemporal());
-                    img = controlador.FotoRotacion(imgTemp);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                break;
-                default:
-                    System.out.println("defecto");
+                tipoGuardado[0]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                tipoGuardado[1]=false;
+                tipoGuardado[2]=false;
+                Imagen.setTipoGuardado(tipoGuardado);
+                img = controlador.FotoNegativa(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+            break;
+            case "escala de grises":
+                tipoGuardado[1]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                tipoGuardado[0]=false;
+                tipoGuardado[2]=false;
+                Imagen.setTipoGuardado(tipoGuardado);
+                img = controlador.FotoEscalaGrises(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+            break;
+            case "blanco y negro":
+                tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                tipoGuardado[0]=false;
+                tipoGuardado[1]=false;
+                Imagen.setTipoGuardado(tipoGuardado);
+                {
+                    try {
+                        img = controlador.FotoBlancoNegro(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                    } catch (IOException ex) {
+                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+            break;
+            case "colores únicos":
+                controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
+            break;
+            case "rotación":
+                BufferedImage imgTemp;
+                imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal());
+                img = controlador.FotoRotacion(imgTemp);
+                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+            break;
+            default:
+                System.out.println("defecto");
         }
             
     }//GEN-LAST:event_opcionActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        System.exit(0);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void guardarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarImagenActionPerformed
+        PDI controlador = new PDI();
+        try {
+            controlador.GuardarImagen(Imagen.getImagenTemporal());
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_guardarImagenActionPerformed
 
     /**
      * @param args the command line arguments
@@ -240,6 +282,7 @@ public class Frame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Cuadro;
+    private javax.swing.JButton guardarImagen;
     private javax.swing.JLabel imagen;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JComboBox<String> opcion;
