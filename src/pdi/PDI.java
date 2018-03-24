@@ -258,25 +258,23 @@ public class PDI {
     }
     
     //Hace la compresion RLE
-    public void CompresionRLE(BufferedImage img, String format)
+    public void CompresionRLE(String format, int[][] mat, int width, int height)  //recibe matriz bitmap, limites de matriz y el formato(pbm,pgm,ppm)
     {
-        int cont, width, height;
-        int[][] mat = new int[2][2];
+        int cont;
         ArrayList<Integer> compress=new ArrayList<>(); 
-        switch (format) {
-            case "pbm" :
+        if (format == "pbm" || format == "pgm") {
             cont = 1;
-            width = 1; 
-            height = 1;
+            width = 2; 
+            height = 2;
             mat[0][0] = 0;
             mat[1][0] = 0;
             mat[0][1] = 1;
             mat[1][1] = 1;
 
-            for (int h=0; h<height+1; h++) {
-                for(int w=1; w<=width+1; w++)
+            for (int h=0; h<height; h++) {
+                for(int w=1; w<=width; w++)
                 {
-                        if ((w!=width+1) && (mat[w-1][h] == mat[w][h])) {
+                        if ((w!=width) && (mat[w-1][h] == mat[w][h])) {
                             cont++;
                         }else{
                             compress.add(cont);
@@ -289,54 +287,36 @@ public class PDI {
                 for (Integer s : compress) {  //aca hay q poner a escribir en archivo
                     System.out.print(s);
                 }
-            break;
-            
-            //si es formato pgm (grayscale)
-            case "pgm" :
+        }
+        if (format == "ppm") {
             cont = 1;
-            width = 1; 
-            height = 1;
-            mat[0][0] = 0;
-            mat[1][0] = 0;
-            mat[0][1] = 1;
-            mat[1][1] = 1;
 
-            for (int h=0; h<height+1; h++) {
-                for(int w=1; w<=width+1; w++)
+            for (int h=0; h<height; h++) {
+                for(int w=3; w<=width; w=w+3)
                 {
-                        if ((w!=width+1) && (mat[w-1][h] == mat[w][h])) {
-                            cont++;
-                        }else{
-                            compress.add(cont);
-                            compress.add(mat[w-1][h]);
-                            cont = 1;
-                        }
+                    if ((w!=width) && (mat[w-3][h] == mat[w][h]) && (mat[w-2][h] == mat[w+1][h]) && (mat[w-1][h] == mat[w+2][h])) {
+                        cont++;
+                    }else{
+                        compress.add(cont);
+                        compress.add(mat[w-3][h]);
+                        compress.add(mat[w-2][h]);
+                        compress.add(mat[w-1][h]);
+                        cont = 1;
+                    }
                 }
             }
-
-                for (Integer s : compress) {  //aca hay q poner a escribir en archivo
-                    System.out.print(s);
-                }
-            break;
-            
-            //si es formato ppm (color)
-            case "ppm":
-            for(int h=0; h<10; h++)
-            
-            break;
+            for (Integer s : compress) {  //aca hay q poner a escribir en archivo
+                System.out.print(s+" ");
+            }
         }
     }
     
-    public void CargarRLE(String format){
-        int height = 6;
-        int width = 4;
-        int arrayy[] = {3,0,2,1,1,0,1,1,1,0,2,1,2,0,6,0,6,1};
+    public void CargarRLE(String format, int[] arrayy, int height, int width){   //recibe limites, formato y Arreglo (imagen comprimida)
+                                                                                //devuelve matriz de bitmap para imagen
+        int[][] bitmap = new int[height][width];
         int ar[] = new int[height*width];
-        int[][] bitmap = new int[width][height];
-        switch (format) {
-            //si es formato pbm (blanco y negro)
-            case "pbm" :
-                int contador = 0;
+        int contador = 0;
+        if (format == "pbm" || format == "pgm") {
                 for (int i=0;i<arrayy.length;i=i+2){
                     for (int j=contador;j<arrayy[i]+contador;j++){
                         ar[j]=arrayy[i+1];
@@ -344,8 +324,8 @@ public class PDI {
                     contador+=arrayy[i];
                 }
                 int indice = 0;
-                for (int i = 0; i < bitmap.length; i++) {
-                    for (int j = 0; j < bitmap[i].length; j++) {
+                for (int i = 0; i < height; i++) {
+                    for (int j = 0; j < width; j++) {
                         bitmap[i][j] = ar[indice];
                         indice++;
                     }
@@ -356,17 +336,29 @@ public class PDI {
                     }
                     System.out.println();
                 }
-            break;
-            
-            //si es formato pgm (grayscale)
-            case "pgm" :
-            
-            break;
-            
-            //si es formato ppm (color)
-            case "ppm":
-            
-            break;
+        }
+        if (format == "ppm") {
+            height = height*3;
+            int arr[] = new int[height*width];
+            for (int i=0;i<arrayy.length;i=i+2){
+                for (int j=contador;j<arrayy[i]+contador;j++){
+                    ar[j]=arrayy[i+1];
+                }
+                contador+=arrayy[i];
+            }
+            int indice = 0;
+            for (int i = 0; i < bitmap.length; i++) {
+                for (int j = 0; j < bitmap[i].length; j++) {
+                    bitmap[i][j] = ar[indice];
+                    indice++;
+                }
+            }
+            for (int i = 0; i < bitmap.length; i++) {
+                for (int j = 0; j < bitmap[i].length; j++) {
+                    System.out.print(bitmap[i][j] + " ");
+                }
+                System.out.println();
+            }
         }
     }
     

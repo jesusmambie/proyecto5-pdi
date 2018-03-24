@@ -242,8 +242,29 @@ public class Frame extends javax.swing.JFrame {
                 Cuadro.add(imagen);
             break;
             case "compresión rle":
-                String format = "pbm";
-                controlador.CargarRLE(format);
+                int c = 1;
+                String format = "pgm";
+                int height = 4;
+                int width = 6;
+                    if (c==1) {
+                        int arrayy[] = {3,0,2,1,1,0,1,1,1,0,2,1,2,0,6,0,6,1};
+                        controlador.CargarRLE(format, arrayy, height, width);
+                    }else{
+                        int[][] mat = new int[width][height];
+                        mat[0][0] = 255;
+                        mat[1][0] = 0;
+                        mat[2][0] = 0;
+                        mat[3][0] = 255;
+                        mat[4][0] = 0;
+                        mat[5][0] = 0;
+                        mat[0][1] = 0;
+                        mat[1][1] = 0;
+                        mat[2][1] = 255;
+                        mat[3][1] = 0;
+                        mat[4][1] = 0;
+                        mat[5][1] = 0;
+                        controlador.CompresionRLE(format, mat, width, height);
+                    }              
             break;
             default:
                 System.out.println("defecto");
