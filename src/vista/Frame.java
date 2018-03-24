@@ -243,7 +243,7 @@ public class Frame extends javax.swing.JFrame {
             break;
             case "compresión rle":
                 String format = "pbm";
-                controlador.CompresionRLE(img, format);
+                controlador.CargarRLE(format);
             break;
             default:
                 System.out.println("defecto");

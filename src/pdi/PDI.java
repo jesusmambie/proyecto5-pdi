@@ -327,6 +327,49 @@ public class PDI {
         }
     }
     
+    public void CargarRLE(String format){
+        int height = 6;
+        int width = 4;
+        int arrayy[] = {3,0,2,1,1,0,1,1,1,0,2,1,2,0,6,0,6,1};
+        int ar[] = new int[height*width];
+        int[][] bitmap = new int[width][height];
+        switch (format) {
+            //si es formato pbm (blanco y negro)
+            case "pbm" :
+                int contador = 0;
+                for (int i=0;i<arrayy.length;i=i+2){
+                    for (int j=contador;j<arrayy[i]+contador;j++){
+                        ar[j]=arrayy[i+1];
+                    }
+                    contador+=arrayy[i];
+                }
+                int indice = 0;
+                for (int i = 0; i < bitmap.length; i++) {
+                    for (int j = 0; j < bitmap[i].length; j++) {
+                        bitmap[i][j] = ar[indice];
+                        indice++;
+                    }
+                }
+                for (int i = 0; i < bitmap.length; i++) {
+                    for (int j = 0; j < bitmap[i].length; j++) {
+                        System.out.print(bitmap[i][j] + " ");
+                    }
+                    System.out.println();
+                }
+            break;
+            
+            //si es formato pgm (grayscale)
+            case "pgm" :
+            
+            break;
+            
+            //si es formato ppm (color)
+            case "ppm":
+            
+            break;
+        }
+    }
+    
     // Lee un byte.
     private static int LeerByte( InputStream in ) throws IOException
     {
