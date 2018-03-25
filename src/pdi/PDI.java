@@ -632,7 +632,7 @@ public class PDI {
                     c = reader.readLine();
                     chunks = c.split("\\s+");
                     
-                    for (int w = 0; w < chunks.length; w++)
+                    for (int w = 0; w < (chunks.length/width); w++)
                     {
                         // se normaliza a 255.
                         pixel = (int) Math.round( ((double) Integer.parseInt(chunks[w])) / maxGray * 255);

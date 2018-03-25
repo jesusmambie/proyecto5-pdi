@@ -152,7 +152,7 @@ public class Frame extends javax.swing.JFrame {
             String ext = path.substring(tamannoExt-3); // Se lee la extensión.
             
             // Si se carga una imagen netbmp se trata de otra forma.
-            if(ext!="bmp") try {
+            if(!ext.equalsIgnoreCase("bmp")) try {
                 img = pdi.Netbmp(ext, path);            // Buffer de la imagen Netbmp.
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
