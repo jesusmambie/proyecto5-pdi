@@ -155,7 +155,7 @@ public class Frame extends javax.swing.JFrame {
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+            
             try {
                 URL url = new File(path).toURI().toURL();
                 if (img == null) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
