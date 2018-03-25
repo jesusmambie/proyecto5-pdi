@@ -9,7 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
@@ -242,29 +244,45 @@ public class Frame extends javax.swing.JFrame {
                 Cuadro.add(imagen);
             break;
             case "compresión rle":
-                int c = 1;
+                int c = 2;
                 String format = "ppm";
                 int height = 2;
                 int width = 2;
+                int max_value;
+                if (format.equals("ppm")) {
+                    width = width*3;
+                }
                     if (c==1) {
-                        int arrayy[] = {2,255,0,0,1,0,0,255,1,0,0,0};
-                        controlador.CargarRLE(format, arrayy, height, width);
+                        max_value = 255;
+                        int arrayy[] = {1,60,0,0,1,0,60,0,1,0,0,60,3,120,120,120};
+                        try {
+                            controlador.CargarRLE(format, arrayy, height, width, max_value);
+                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }else{
-                        int[][] mat = new int[width][height];
-                        mat[0][0] = 255;
-                        mat[1][0] = 0;
-                        mat[2][0] = 0;
-                        mat[3][0] = 255;
-                        mat[4][0] = 0;
-                        mat[5][0] = 0;
+                        int[][] mat = new int[height][width];
+                        max_value = 120;
+                        
+                        mat[0][0] = 120;
                         mat[0][1] = 0;
+                        mat[0][2] = 0;
+                        mat[0][3] = 120;
+                        mat[0][4] = 0;
+                        mat[0][5] = 0;
+                        mat[1][0] = 0;
                         mat[1][1] = 0;
-                        mat[2][1] = 255;
-                        mat[3][1] = 0;
-                        mat[4][1] = 0;
-                        mat[5][1] = 0;
-                        controlador.CompresionRLE(format, mat, width, height);
-                    }              
+                        mat[1][2] = 120;
+                        mat[1][3] = 0;
+                        mat[1][4] = 0;
+                        mat[1][5] = 0;
+                                               
+                        try {
+                            controlador.CompresionRLE(format, mat, width, height, max_value);
+                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
             break;
             default:
                 System.out.println("defecto");
