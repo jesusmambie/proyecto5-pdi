@@ -262,7 +262,7 @@ public class PDI {
     {
         int cont;
         ArrayList<Integer> compress=new ArrayList<>(); 
-        if (format == "pbm" || format == "pgm") {
+        if ("pbm".equals(format) || "pgm".equals(format)) {
             cont = 1;
             width = 2; 
             height = 2;
@@ -284,11 +284,12 @@ public class PDI {
                 }
             }
 
-                for (Integer s : compress) {  //aca hay q poner a escribir en archivo
-                    System.out.print(s);
-                }
+            compress.stream().forEach((s) -> {
+                //aca hay q poner a escribir en archivo
+                System.out.print(s);
+            });
         }
-        if (format == "ppm") {
+        if ("ppm".equals(format)) {
             cont = 1;
 
             for (int h=0; h<height; h++) {
@@ -305,18 +306,19 @@ public class PDI {
                     }
                 }
             }
-            for (Integer s : compress) {  //aca hay q poner a escribir en archivo
+            compress.stream().forEach((s) -> {
+                //aca hay q poner a escribir en archivo
                 System.out.print(s+" ");
-            }
+            });
         }
     }
     
     public void CargarRLE(String format, int[] arrayy, int height, int width){   //recibe limites, formato y Arreglo (imagen comprimida)
-                                                                                //devuelve matriz de bitmap para imagen
-        int[][] bitmap = new int[height][width];
-        int ar[] = new int[height*width];
+                                                                                //devuelve matriz de bitmap para imagen      
         int contador = 0;
-        if (format == "pbm" || format == "pgm") {
+        if ("pbm".equals(format) || "pgm".equals(format)) {
+            int ar[] = new int[height*width];
+            int[][] bitmap = new int[height][width];
                 for (int i=0;i<arrayy.length;i=i+2){
                     for (int j=contador;j<arrayy[i]+contador;j++){
                         ar[j]=arrayy[i+1];
@@ -330,32 +332,38 @@ public class PDI {
                         indice++;
                     }
                 }
-                for (int i = 0; i < bitmap.length; i++) {
-                    for (int j = 0; j < bitmap[i].length; j++) {
-                        System.out.print(bitmap[i][j] + " ");
-                    }
-                    System.out.println();
+            for (int[] bitmap1 : bitmap) {
+                for (int j = 0; j < bitmap1.length; j++) {
+                    System.out.print(bitmap1[j] + " ");
                 }
+                System.out.println();
+            }
         }
-        if (format == "ppm") {
-            height = height*3;
+        if ("ppm".equals(format)) {
+            width = width*3;
             int arr[] = new int[height*width];
-            for (int i=0;i<arrayy.length;i=i+2){
-                for (int j=contador;j<arrayy[i]+contador;j++){
-                    ar[j]=arrayy[i+1];
+            int[][] bitmap = new int[height][width];
+            for (int i=0;i<arrayy.length;i=i+4){
+                for (int j=0;j<arrayy[i];j++){
+                    arr[contador]=arrayy[i+1];
+                    arr[contador+1]=arrayy[i+2];
+                    arr[contador+2]=arrayy[i+3];
+                    contador+=3;
                 }
-                contador+=arrayy[i];
             }
+        
             int indice = 0;
-            for (int i = 0; i < bitmap.length; i++) {
-                for (int j = 0; j < bitmap[i].length; j++) {
-                    bitmap[i][j] = ar[indice];
-                    indice++;
+            for (int[] bitmap1 : bitmap) {
+                for (int j = 0; j < bitmap1.length; j+=3) {
+                    bitmap1[j] = arr[indice];
+                    bitmap1[j+1] = arr[indice+1];
+                    bitmap1[j+2] = arr[indice+2];
+                    indice+=3;
                 }
             }
-            for (int i = 0; i < bitmap.length; i++) {
-                for (int j = 0; j < bitmap[i].length; j++) {
-                    System.out.print(bitmap[i][j] + " ");
+            for (int[] bitmap1 : bitmap) {
+                for (int j = 0; j < bitmap1.length; j++) {
+                    System.out.print(bitmap1[j] + " ");
                 }
                 System.out.println();
             }

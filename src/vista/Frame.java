@@ -243,11 +243,11 @@ public class Frame extends javax.swing.JFrame {
             break;
             case "compresión rle":
                 int c = 1;
-                String format = "pgm";
-                int height = 4;
-                int width = 6;
+                String format = "ppm";
+                int height = 2;
+                int width = 2;
                     if (c==1) {
-                        int arrayy[] = {3,0,2,1,1,0,1,1,1,0,2,1,2,0,6,0,6,1};
+                        int arrayy[] = {2,255,0,0,1,0,0,255,1,0,0,0};
                         controlador.CargarRLE(format, arrayy, height, width);
                     }else{
                         int[][] mat = new int[width][height];
