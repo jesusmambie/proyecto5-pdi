@@ -15,6 +15,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -250,6 +252,234 @@ public class PDI {
         }
         System.out.println(pixels.size());
         return pixels.size();
+    }
+    
+    //Hace la compresion RLE
+    public void CompresionRLE(String format, int[][] mat, int width, int height, int max_value) throws FileNotFoundException, UnsupportedEncodingException  //recibe matriz bitmap, limites de matriz y el formato(pbm,pgm,ppm)
+    {
+        int cont;
+        ArrayList<Integer> compress=new ArrayList<>(); 
+        if ("pbm".equals(format) || "pgm".equals(format)) {
+            cont = 1;
+
+            for (int h=0; h<height; h++) {
+                for(int w=1; w<=width; w++)
+                {
+                    if ((w!=width) && (mat[h][w-1] == mat[h][w])) {
+                        cont++;
+                    }else{
+                        compress.add(cont);
+                        compress.add(mat[h][w-1]);
+                        cont = 1;
+                    }
+                }
+            }
+
+            if ("pbm".equals(format)) {
+                for (int i = 0; i<compress.size();i++) { 
+                    System.out.print(compress.get(i)+" ");
+                }
+                System.out.println();
+
+                try (PrintWriter writer = new PrintWriter("file_pbm.rle", "UTF-8")) {
+                    writer.println("P1");
+                    writer.println(width+" "+height);
+                    for (int i = 0; i<compress.size();i++) { 
+                        writer.print(compress.get(i)+" ");
+                    }
+                    writer.close();
+                }
+            }
+            if ("pgm".equals(format)) {
+                for (int i = 0; i<compress.size();i++) { 
+                    System.out.print(compress.get(i)+" ");
+                }
+                System.out.println();
+
+                try (PrintWriter writer = new PrintWriter("file_pgm.rle", "UTF-8")) {
+                    writer.println("P2");
+                    writer.println(width+" "+height);
+                    writer.println(max_value);
+                    for (int i = 0; i<compress.size();i++) { 
+                        writer.print(compress.get(i)+" ");
+                    }
+                    writer.close();
+                }
+            }
+        }
+        if ("ppm".equals(format)) {
+            cont = 1;
+
+            for (int h=0; h<height; h++) {
+                for(int w=3; w<=width; w=w+3)
+                {
+                    if ((w!=width) && (mat[h][w-3] == mat[h][w]) && (mat[h][w-2] == mat[h][w+1]) && (mat[h][w-1] == mat[h][w+2])) {
+                        cont++;
+                    }else{
+                        compress.add(cont);
+                        compress.add(mat[h][w-3]);
+                        compress.add(mat[h][w-2]);
+                        compress.add(mat[h][w-1]);
+                        cont = 1;
+                    }
+                }
+            }
+            
+            for (int i = 0; i<compress.size();i++) { 
+                System.out.print(compress.get(i)+" ");
+            }
+            System.out.println();
+            
+            try (PrintWriter writer = new PrintWriter("file_ppm.rle", "UTF-8")) {
+                writer.println("P3");
+                writer.println(width/3+" "+height);
+                writer.println(max_value);
+                for (int i = 0; i<compress.size();i++) { 
+                    writer.print(compress.get(i)+" ");
+                }
+                writer.close();
+            }
+        }
+    }
+    
+    public void CargarRLE(String format, int[] arrayy, int height, int width, int max_value) throws FileNotFoundException, UnsupportedEncodingException{   //recibe limites, formato y Arreglo (imagen comprimida)
+                                                                                //devuelve matriz de bitmap para imagen   
+        int[][] bitmap = new int[height][width];
+        int contador = 0;
+        if ("pbm".equals(format) || "pgm".equals(format)) {
+            int ar[] = new int[height*width];
+                for (int i=0;i<arrayy.length;i=i+2){
+                    for (int j=contador;j<arrayy[i]+contador;j++){
+                        ar[j]=arrayy[i+1];
+                    }
+                    contador+=arrayy[i];
+                }
+                int indice = 0;
+                for (int i = 0; i < height; i++) {
+                    for (int j = 0; j < width; j++) {
+                        bitmap[i][j] = ar[indice];
+                        indice++;
+                    }
+                }
+                if (format.equals("pbm")) {
+                    //salida
+                    System.out.println("P1");
+                    System.out.println(height + " " + width);
+                    for (int i = 0; i< height; i++) {
+                        for (int j = 0; j < width; j++) {
+                            System.out.print(bitmap[i][j] + " ");
+                        }
+                        System.out.println();
+                    }
+                } else {
+                    System.out.println("P2");
+                    System.out.println(height + " " + width);
+                    System.out.print(max_value);
+                    for (int i=0; i<height; i++) {
+                        for (int j = 0; j < width; j++) {
+                            System.out.print(bitmap[i][j] + " ");
+                        }
+                        System.out.println();
+                    }
+                }
+        }
+        if ("ppm".equals(format)) {
+            int arr[] = new int[height*width];
+            for (int i=0;i<arrayy.length;i=i+4){
+                for (int j=0;j<arrayy[i];j++){
+                    arr[contador]=arrayy[i+1];
+                    arr[contador+1]=arrayy[i+2];
+                    arr[contador+2]=arrayy[i+3];
+                    contador+=3;
+                }
+            }
+        
+            int indice = 0;
+            for (int i=0;i<height;i++) {
+                for (int j = 0; j < width; j+=3) {
+                    bitmap[i][j] = arr[indice];
+                    bitmap[i][j+1] = arr[indice+1];
+                    bitmap[i][j+2] = arr[indice+2];
+                    indice+=3;
+                }
+            }
+            System.out.println("P3");
+            System.out.println(height + " " + width/3);
+            System.out.print(max_value);
+            for (int i=0;i<height;i++) {
+                for (int j = 0; j < width; j++) {
+                    System.out.print(bitmap[i][j] + " ");
+                }
+                System.out.println();
+            }
+        }
+        CrearArchivoNetpbm(format, bitmap, height, width, max_value);
+    }
+   
+    
+    public void CrearArchivoNetpbm (String format, int[][]matrix, int height, int width, int max_value) throws FileNotFoundException, UnsupportedEncodingException {
+        int length;
+        switch (format){
+            case "pbm":
+            try (PrintWriter writer = new PrintWriter("bitmap.pbm", "UTF-8")) {
+                writer.println("P1");
+                writer.println(width+" "+height);
+                for (int i=0;i<height;i++) {
+                    for (int j = 0; j < width; j++) {
+                        writer.print(matrix[i][j] + " ");
+                    }
+                    writer.println();
+                }
+                writer.close();
+            }
+            break;
+            case "pgm":
+            try (PrintWriter writer = new PrintWriter("bitmap.pgm", "UTF-8")) {
+                writer.println("P2");
+                writer.println(width+" "+height);
+                writer.println(max_value);
+                for (int i=0;i<height;i++) {
+                    for (int j = 0; j < width; j++) {
+                        length = String.valueOf(matrix[i][j]).length();
+                        if (length == 1) {
+                            writer.print(matrix[i][j] + "   ");
+                        }
+                        if (length == 2) {
+                            writer.print(matrix[i][j] + "  ");
+                        }
+                        if (length == 3) {
+                            writer.print(matrix[i][j] + " ");
+                        }
+                    }
+                    writer.println();
+                }
+                writer.close();
+            }
+            break;
+            case "ppm":
+            try (PrintWriter writer = new PrintWriter("bitmap.ppm", "UTF-8")) {
+                writer.println("P3");
+                writer.println(width/3+" "+height);
+                writer.println(max_value);
+                for (int i=0;i<height;i++) {
+                    for (int j = 0; j < width; j++) {
+                        length = String.valueOf(matrix[i][j]).length();
+                        if (length == 1) {
+                            writer.print(matrix[i][j] + "   ");
+                        }
+                        if (length == 2) {
+                            writer.print(matrix[i][j] + "  ");
+                        }
+                        if (length == 3) {
+                            writer.print(matrix[i][j] + " ");
+                        }
+                    }
+                    writer.println();
+                }
+                writer.close();
+            }
+            break;
+        }
     }
     
     // Lee un byte.
