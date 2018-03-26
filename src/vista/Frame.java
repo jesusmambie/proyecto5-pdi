@@ -189,7 +189,11 @@ public class Frame extends javax.swing.JFrame {
                             }
                             System.out.println();
                             c.CargarRLE(format, array, width, height, 0);
-                            //cargar imagen
+                            File currentDirFile = new File("");
+                            String helper = currentDirFile.getAbsolutePath();
+                            helper.substring(0, helper.length() - 1);
+
+                            img = pdi.Netbmp("pbm", helper +"/bitmap.pbm");
                         }
                         if (info.get(0).equals("P2")) {
                             String format = "pgm";
@@ -209,7 +213,11 @@ public class Frame extends javax.swing.JFrame {
                             }
                             System.out.println();
                             c.CargarRLE(format, array, width, height, max_value);
-                            //cargar imagen
+                            File currentDirFile = new File("");
+                            String helper = currentDirFile.getAbsolutePath();
+                            helper.substring(0, helper.length() - 1);
+
+                            img = pdi.Netbmp("pbm", helper +"/bitmap.pgm");
                         }
                         if (info.get(0).equals("P3")) {
                             String format = "ppm";
@@ -229,7 +237,11 @@ public class Frame extends javax.swing.JFrame {
                             }
                             System.out.println();
                             c.CargarRLE(format, array, width, height, max_value);
-                            //cargar imagen
+                            File currentDirFile = new File("");
+                            String helper = currentDirFile.getAbsolutePath();
+                            helper.substring(0, helper.length() - 1);
+
+                            img = pdi.Netbmp("pbm", helper +"/bitmap.ppm");
                         }
                         
                 } else {
