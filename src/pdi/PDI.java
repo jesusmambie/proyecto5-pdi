@@ -528,65 +528,7 @@ public class PDI {
     {
         return 0xff000000 | ( r << 16 ) | ( g << 8 ) | b;
     }
-    
-    private static int readByte( InputStream in ) throws IOException
-    {
-        int b = in.read();
-        if ( b == -1 )
-            throw new EOFException();
-        return b;
-    }
-    
-    private static char readChar( InputStream in ) throws IOException
-    {
-        char c;
-        
-        c = (char) readByte( in );
-        if ( c == '#' )
-        {
-            do
-            {
-                c = (char) readByte( in );
-            }
-            while ( c != '\n' && c != '\r' );
-        }
-        
-        return c;
-    }
-    
-    private static char readNonwhiteChar( InputStream in ) throws IOException
-    {
-        char c;
-        
-        do
-        {
-            c = readChar( in );
-        }
-        while ( c == ' ' || c == '\t' || c == '\n' || c == '\r' );
-        
-        return c;
-    }
-    
-    private static int readInt( InputStream in ) throws IOException
-    {
-        char c;
-        int i;
-        
-        c = readNonwhiteChar( in );
-        if ( c < '0' || c > '9' )
-            throw new IOException( "junk in file where integer should be" );
-        
-        i = 0;
-        do
-        {
-            i = i * 10 + c - '0';
-            c = readChar( in );
-        }
-        while ( c >= '0' && c <= '9' );
-        
-        return i;
-    }
-    
+      
     // Lectura de todas las imágines Netbmp.
     public BufferedImage Netbmp(String tipoNetbmp, String ruta) throws FileNotFoundException, IOException{
                 
@@ -626,17 +568,27 @@ public class PDI {
         switch(tipoNetbmp.toLowerCase())
         {
             case "ppm":
-                img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+                img = new BufferedImage(width*3, height, BufferedImage.TYPE_INT_RGB);
                 for (int h = 0; h < height; h++)
                 {
                     c = reader.readLine();
                     chunks = c.split("\\s+");
                     
-                    for (int w = 0; w < (chunks.length/width); w++)
+                    for (int w = 0; w < (chunks.length); w++)
                     {
-                        // se normaliza a 255.
-                        pixel = (int) Math.round( ((double) Integer.parseInt(chunks[w])) / maxGray * 255);
-                        img.setRGB(w, h, pixel);
+                        red = Integer.parseInt(chunks[w]);
+                        if(red!=0)red = 255-(maxGray - red);
+                        green = Integer.parseInt(chunks[w+1]);
+                        if(green!=0)green = 255-(maxGray - green);
+                        blue = Integer.parseInt(chunks[w+2]);
+                        if(blue!=0)blue = 255-(maxGray - blue);
+                        
+                        rgb = makeRgb(red, green, blue);
+                        
+                        img.setRGB(w, h, rgb);
+                        img.setRGB(w+1, h, rgb);
+                        img.setRGB(w+2, h, rgb);
+                        w = w + 2;
                     }
                 }
                 break;
