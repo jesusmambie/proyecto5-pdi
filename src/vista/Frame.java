@@ -5,15 +5,17 @@
  */
 package vista;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -30,6 +32,10 @@ import pdi.PDI;
 public class Frame extends javax.swing.JFrame {
 
     private PDI pdi = new PDI();
+    private int height = 0;
+    private int width = 0;
+    private int max_value = 255;
+    private ArrayList<String> info = new ArrayList<>();
 
     /**
      * Creates new form Frame
@@ -133,8 +139,11 @@ public class Frame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    @SuppressWarnings("empty-statement")
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         
+        PDI c = new PDI();
+        boolean bandera = false;
         JFileChooser file = new JFileChooser();
         file.setCurrentDirectory(new File(System.getProperty("user.home")));
         
@@ -153,14 +162,97 @@ public class Frame extends javax.swing.JFrame {
             
             // Si se carga una imagen netbmp se trata de otra forma.
             if(!ext.equalsIgnoreCase("bmp")) try {
-                img = pdi.Netbmp(ext, path);            // Buffer de la imagen Netbmp.
+                if (ext.equals("rle")) {
+                    bandera = true;
+                    FileReader reader = null;
+                    String line = null;
+                    File read = file.getSelectedFile();
+                    reader = new FileReader(read);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+                
+                        while((line = bufferedReader.readLine()) != null) {
+                            info.add(line);
+                        }
+                        if (info.get(0).equals("P1")) {
+                            String format = "pbm";
+                            width = Character.getNumericValue(info.get(1).charAt(0));
+                            height = Character.getNumericValue(info.get(1).charAt(2));
+                            String ar[] = info.get(2).split("\\s+");
+                            int array[] = new int[ar.length];
+                            for (int i = 0; i< ar.length; i++) {
+                                array[i] = Integer.parseInt(ar[i]);
+                            }
+                            System.out.println(format);
+                            System.out.println(width + " " +height);
+                            for (int i = 0; i< ar.length; i++) {
+                                System.out.println(array[i] + " ");
+                            }
+                            System.out.println();
+                            c.CargarRLE(format, array, width, height, 0);
+                            //cargar imagen
+                        }
+                        if (info.get(0).equals("P2")) {
+                            String format = "pgm";
+                            width = Character.getNumericValue(info.get(1).charAt(0));
+                            height = Character.getNumericValue(info.get(1).charAt(2));
+                            String[] val = info.get(2).split("\\s+");
+                            max_value = Integer.parseInt(val[0]);
+                            String ar[] = info.get(3).split("\\s+");
+                            int array[] = new int[ar.length];
+                            for (int i = 0; i< ar.length; i++) {
+                                array[i] = Integer.parseInt(ar[i]);
+                            }
+                            System.out.println(format);
+                            System.out.println(width + " " +height);
+                            for (int i = 0; i< ar.length; i++) {
+                                System.out.println(array[i] + " ");
+                            }
+                            System.out.println();
+                            c.CargarRLE(format, array, width, height, max_value);
+                            //cargar imagen
+                        }
+                        if (info.get(0).equals("P3")) {
+                            String format = "ppm";
+                            width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
+                            height = Character.getNumericValue(info.get(1).charAt(2));
+                            String[] val = info.get(2).split("\\s+");
+                            max_value = Integer.parseInt(val[0]);
+                            String ar[] = info.get(3).split("\\s+");
+                            int array[] = new int[ar.length];
+                            for (int i = 0; i< ar.length; i++) {
+                                array[i] = Integer.parseInt(ar[i]);
+                            }
+                            System.out.println(format);
+                            System.out.println(width + " " +height);
+                            for (int i = 0; i< ar.length; i++) {
+                                System.out.println(array[i] + " ");
+                            }
+                            System.out.println();
+                            c.CargarRLE(format, array, width, height, max_value);
+                            //cargar imagen
+                        }
+                        
+                } else {
+                    bandera = true;
+                    FileReader reader = null;
+                    String line = null;
+                    File read = file.getSelectedFile();
+                    reader = new FileReader(read);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+
+                        while((line = bufferedReader.readLine()) != null) {
+                            info.add(line);
+                        }
+
+                    img = pdi.Netbmp(ext, path);            // Buffer de la imagen Netbmp.
+                }
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
             
             try {
                 URL url = new File(path).toURI().toURL();
-                if (img == null) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
+                if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
                 imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
@@ -244,47 +336,99 @@ public class Frame extends javax.swing.JFrame {
                 Cuadro.add(imagen);
             break;
             case "compresión rle":
-                int c = 2;
-                String format = "ppm";
-                int height = 2;
-                int width = 2;
-                int max_value;
-                if (format.equals("ppm")) {
-                    width = width*3;
-                }
-                    if (c==1) {
-                        max_value = 255;
-                        int arrayy[] = {1,60,0,0,1,0,60,0,1,0,0,60,3,120,120,120};
-                        try {
-                            controlador.CargarRLE(format, arrayy, height, width, max_value);
-                        } catch (FileNotFoundException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                        } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-                    }else{
-                        int[][] mat = new int[height][width];
-                        max_value = 120;
-                        
-                        mat[0][0] = 120;
-                        mat[0][1] = 0;
-                        mat[0][2] = 0;
-                        mat[0][3] = 120;
-                        mat[0][4] = 0;
-                        mat[0][5] = 0;
-                        mat[1][0] = 0;
-                        mat[1][1] = 0;
-                        mat[1][2] = 120;
-                        mat[1][3] = 0;
-                        mat[1][4] = 0;
-                        mat[1][5] = 0;
-                                               
-                        try {
-                            controlador.CompresionRLE(format, mat, width, height, max_value);
-                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                
+                int cont = 0;
+                String format;          
+                if ("P1".equals(info.get(0))) {
+                    format = "pbm";
+                    width = Character.getNumericValue(info.get(1).charAt(0));
+                    height = Character.getNumericValue(info.get(1).charAt(2));
+                    int aux[] = new int[height*width];
+                    int[][] mat = new int[height][width];
+                    for (int i = 2; i<info.size();i++) { 
+                        for (int j = 0; j< info.get(i).length(); j++) {
+                            if (info.get(i).charAt(j) != ' ') {
+                                aux[cont] = Character.getNumericValue(info.get(i).charAt(j));
+                                cont++;
+                            }
                         }
                     }
+                    cont=0;
+                    for (int i = 0; i<height;i++) { 
+                        for (int j = 0; j<width;j++) { 
+                            mat[i][j] = aux[cont];
+                            cont++;
+                        }
+                    }
+                    try {
+                        controlador.CompresionRLE(format, mat, width, height, max_value);
+                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    cont=0;
+                }
+                if ("P2".equals(info.get(0))) {
+                    format = "pgm";
+                    String temp;
+                    width = Character.getNumericValue(info.get(1).charAt(0));
+                    height = Character.getNumericValue(info.get(1).charAt(2));
+                    String[] val = info.get(2).split("\\s+");
+                    max_value = Integer.parseInt(val[0]);
+                    int aux[] = new int[height*width];
+                    int[][] mat = new int[height][width];
+                    
+                    for (int i = 3; i<info.size();i++) { 
+                        String[] parts = info.get(i).split("\\s+");
+                        for (int j = 0; j < parts.length; j++) {
+                            aux[cont] = Integer.parseInt(parts[j]);
+                            cont++;
+                        }
+                    }
+                    cont=0;
+                    for (int i = 0; i<height;i++) { 
+                        for (int j = 0; j<width;j++) { 
+                            mat[i][j] = aux[cont];
+                            cont++;
+                        }
+                    }
+                    try {
+                        controlador.CompresionRLE(format, mat, width, height, max_value);
+                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    cont=0;
+                }
+                if ("P3".equals(info.get(0))) {
+                    format = "ppm";
+                    String temp;
+                    width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
+                    height = Character.getNumericValue(info.get(1).charAt(2));
+                    String[] val = info.get(2).split("\\s+");
+                    max_value = Integer.parseInt(val[0]);
+                    int aux[] = new int[height*width];
+                    int[][] mat = new int[height][width];
+                    
+                    for (int i = 3; i<info.size();i++) { 
+                        String[] parts = info.get(i).split("\\s+");
+                        for (int j = 0; j < parts.length; j++) {
+                            aux[cont] = Integer.parseInt(parts[j]);
+                            cont++;
+                        }
+                    }
+                    cont=0;
+                    for (int i = 0; i<height;i++) { 
+                        for (int j = 0; j<width;j++) { 
+                            mat[i][j] = aux[cont];
+                            cont++;
+                        }
+                    }
+                    try {
+                        controlador.CompresionRLE(format, mat, width, height, max_value);
+                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    cont=0;
+                }
             break;
             default:
                 System.out.println("defecto");

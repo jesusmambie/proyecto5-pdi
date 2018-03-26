@@ -342,7 +342,7 @@ public class PDI {
         }
     }
     
-    public void CargarRLE(String format, int[] arrayy, int height, int width, int max_value) throws FileNotFoundException, UnsupportedEncodingException{   //recibe limites, formato y Arreglo (imagen comprimida)
+    public void CargarRLE(String format, int[] arrayy, int width, int height, int max_value) throws FileNotFoundException, UnsupportedEncodingException{   //recibe limites, formato y Arreglo (imagen comprimida)
                                                                                 //devuelve matriz de bitmap para imagen   
         int[][] bitmap = new int[height][width];
         int contador = 0;
