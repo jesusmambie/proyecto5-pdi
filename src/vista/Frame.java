@@ -36,6 +36,13 @@ public class Frame extends javax.swing.JFrame {
     private int width = 0;
     private int max_value = 255;
     private ArrayList<String> info = new ArrayList<>();
+    private String global_case;
+    PDI controlador = new PDI();
+    BufferedImage img = null;
+    BufferedImage myimg = null;
+    Image imagenFinal;
+    int umbral = 128;
+    int aux = 1;
 
     /**
      * Creates new form Frame
@@ -58,6 +65,8 @@ public class Frame extends javax.swing.JFrame {
         jToggleButton1 = new javax.swing.JToggleButton();
         opcion = new javax.swing.JComboBox<>();
         guardarImagen = new javax.swing.JButton();
+        more = new javax.swing.JButton();
+        less = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,7 +101,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Negativo", "Escala de grises", "Blanco y negro", "Colores únicos", "Rotación", "Compresión RLE" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Rotación" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -106,22 +115,43 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
+        more.setText("+");
+        more.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                moreActionPerformed(evt);
+            }
+        });
+
+        less.setText("-");
+        less.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lessActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(164, 164, 164)
                 .addComponent(guardarImagen)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToggleButton1)
                 .addGap(87, 87, 87)
-                .addComponent(opcion, 0, 165, Short.MAX_VALUE)
-                .addGap(69, 69, 69))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(more)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(less)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(opcion, 0, 165, Short.MAX_VALUE)
+                        .addGap(69, 69, 69))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -133,7 +163,11 @@ public class Frame extends javax.swing.JFrame {
                     .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton1)
                     .addComponent(guardarImagen))
-                .addGap(83, 83, 83))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(more)
+                    .addComponent(less))
+                .addGap(42, 42, 42))
         );
 
         pack();
@@ -142,6 +176,8 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("empty-statement")
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         
+        more.setEnabled(false);
+        less.setEnabled(false);
         PDI c = new PDI();
         boolean bandera = false;
         JFileChooser file = new JFileChooser();
@@ -272,6 +308,12 @@ public class Frame extends javax.swing.JFrame {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
             Imagen.setImagenOrinal(img); // Se guarda la imagen en el modelo
+            File f = new File("imagen_original.png");
+            try {
+                ImageIO.write(Imagen.getImagenOrinal(), "PNG", f);
+            } catch (IOException ex) {
+                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            }
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
             Cuadro.setVisible(true);
@@ -287,163 +329,189 @@ public class Frame extends javax.swing.JFrame {
     }//GEN-LAST:event_jToggleButton1KeyPressed
 
     private void opcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opcionActionPerformed
-        String caso = opcion.getSelectedItem().toString().toLowerCase(); // Obtengo la opción del combo box.
-        PDI controlador = new PDI();
-        BufferedImage img = null;
-        Image imagenFinal;
-        boolean[] tipoGuardado = {false,false,false};
-        switch(caso)
-        {
-            case "original":
-                img = Imagen.getImagenOrinal();
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                imagen.setIcon(new ImageIcon(imagenFinal));
-                Cuadro.add(imagen);
-            break;
-            case "negativo":
-                tipoGuardado[0]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                tipoGuardado[1]=false;
-                tipoGuardado[2]=false;
-                Imagen.setTipoGuardado(tipoGuardado);
-                img = controlador.FotoNegativa(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                imagen.setIcon(new ImageIcon(imagenFinal));
-                Cuadro.add(imagen);
-            break;
-            case "escala de grises":
-                tipoGuardado[1]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                tipoGuardado[0]=false;
-                tipoGuardado[2]=false;
-                Imagen.setTipoGuardado(tipoGuardado);
-                img = controlador.FotoEscalaGrises(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                imagen.setIcon(new ImageIcon(imagenFinal));
-                Cuadro.add(imagen);
-            break;
-            case "blanco y negro":
-                tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                tipoGuardado[0]=false;
-                tipoGuardado[1]=false;
-                Imagen.setTipoGuardado(tipoGuardado);
-                {
-                    try {
-                        img = controlador.FotoBlancoNegro(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
-                    } catch (IOException ex) {
-                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            String caso = opcion.getSelectedItem().toString().toLowerCase(); // Obtengo la opción del combo box.
+            global_case = caso;
+            boolean[] tipoGuardado = {false,false,false};
+            switch(caso)
+            {
+                case "mostrar información":
+                    more.setEnabled(false);
+                    less.setEnabled(false);
+                    controlador.Information(Imagen.getImagenOrinal());
+                    break;
+                case "histograma":
+                    more.setEnabled(false);
+                    less.setEnabled(false);
+                    controlador.Histograma((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal()));
+                    break;
+                case "modificar brillo":
+                    more.setEnabled(true);
+                    less.setEnabled(true);
+                    break;
+                case "modificar contraste":
+                    more.setEnabled(true);
+                    less.setEnabled(true);
+                    break;
+                case "umbralización":
+                    more.setEnabled(true);
+                    less.setEnabled(true);
+                    break;
+                case "original":
+                    more.setEnabled(false);
+                    less.setEnabled(false);
+                    img = Imagen.getImagenOrinal();
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
+                case "negativo":
+                    tipoGuardado[0]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                    tipoGuardado[1]=false;
+                    tipoGuardado[2]=false;
+                    Imagen.setTipoGuardado(tipoGuardado);
+                    img = controlador.FotoNegativa(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
+                case "escala de grises":
+                    tipoGuardado[1]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                    tipoGuardado[0]=false;
+                    tipoGuardado[2]=false;
+                    Imagen.setTipoGuardado(tipoGuardado);
+                    img = controlador.FotoEscalaGrises(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
+                case "blanco y negro":
+                    tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                    tipoGuardado[0]=false;
+                    tipoGuardado[1]=false;
+                    Imagen.setTipoGuardado(tipoGuardado);
+                    {
+                        try {
+                            img = controlador.FotoBlancoNegro(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                        } catch (IOException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                imagen.setIcon(new ImageIcon(imagenFinal));
-                Cuadro.add(imagen);
-            break;
-            case "colores únicos":
-                controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
-            break;
-            case "rotación":
-                BufferedImage imgTemp;
-                imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal());
-                img = controlador.FotoRotacion(imgTemp);
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                imagen.setIcon(new ImageIcon(imagenFinal));
-                Cuadro.add(imagen);
-            break;
-            case "compresión rle":
-                
-                int cont = 0;
-                String format;          
-                if ("P1".equals(info.get(0))) {
-                    format = "pbm";
-                    width = Character.getNumericValue(info.get(1).charAt(0));
-                    height = Character.getNumericValue(info.get(1).charAt(2));
-                    int aux[] = new int[height*width];
-                    int[][] mat = new int[height][width];
-                    for (int i = 2; i<info.size();i++) { 
-                        for (int j = 0; j< info.get(i).length(); j++) {
-                            if (info.get(i).charAt(j) != ' ') {
-                                aux[cont] = Character.getNumericValue(info.get(i).charAt(j));
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
+                case "colores únicos":
+                    controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
+                    break;
+                case "rotación":
+                    BufferedImage imgTemp;
+                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal());
+                    img = controlador.FotoRotacion(imgTemp);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
+                case "compresión rle":
+                    
+                    int cont = 0;
+                    String format;
+                    if ("P1".equals(info.get(0))) {
+                        format = "pbm";
+                        width = Character.getNumericValue(info.get(1).charAt(0));
+                        height = Character.getNumericValue(info.get(1).charAt(2));
+                        int aux[] = new int[height*width];
+                        int[][] mat = new int[height][width];
+                        for (int i = 2; i<info.size();i++) {
+                            for (int j = 0; j< info.get(i).length(); j++) {
+                                if (info.get(i).charAt(j) != ' ') {
+                                    aux[cont] = Character.getNumericValue(info.get(i).charAt(j));
+                                    cont++;
+                                }
+                            }
+                        }
+                        cont=0;
+                        for (int i = 0; i<height;i++) {
+                            for (int j = 0; j<width;j++) {
+                                mat[i][j] = aux[cont];
                                 cont++;
                             }
                         }
-                    }
-                    cont=0;
-                    for (int i = 0; i<height;i++) { 
-                        for (int j = 0; j<width;j++) { 
-                            mat[i][j] = aux[cont];
-                            cont++;
+                        try {
+                            controlador.CompresionRLE(format, mat, width, height, max_value);
+                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        cont=0;
                     }
-                    try {
-                        controlador.CompresionRLE(format, mat, width, height, max_value);
-                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    cont=0;
-                }
-                if ("P2".equals(info.get(0))) {
-                    format = "pgm";
-                    String temp;
-                    width = Character.getNumericValue(info.get(1).charAt(0));
-                    height = Character.getNumericValue(info.get(1).charAt(2));
-                    String[] val = info.get(2).split("\\s+");
-                    max_value = Integer.parseInt(val[0]);
-                    int aux[] = new int[height*width];
-                    int[][] mat = new int[height][width];
-                    
-                    for (int i = 3; i<info.size();i++) { 
-                        String[] parts = info.get(i).split("\\s+");
-                        for (int j = 0; j < parts.length; j++) {
-                            aux[cont] = Integer.parseInt(parts[j]);
-                            cont++;
+                    if ("P2".equals(info.get(0))) {
+                        format = "pgm";
+                        String temp;
+                        width = Character.getNumericValue(info.get(1).charAt(0));
+                        height = Character.getNumericValue(info.get(1).charAt(2));
+                        String[] val = info.get(2).split("\\s+");
+                        max_value = Integer.parseInt(val[0]);
+                        int aux[] = new int[height*width];
+                        int[][] mat = new int[height][width];
+                        
+                        for (int i = 3; i<info.size();i++) {
+                            String[] parts = info.get(i).split("\\s+");
+                            for (int j = 0; j < parts.length; j++) {
+                                aux[cont] = Integer.parseInt(parts[j]);
+                                cont++;
+                            }
                         }
-                    }
-                    cont=0;
-                    for (int i = 0; i<height;i++) { 
-                        for (int j = 0; j<width;j++) { 
-                            mat[i][j] = aux[cont];
-                            cont++;
+                        cont=0;
+                        for (int i = 0; i<height;i++) {
+                            for (int j = 0; j<width;j++) {
+                                mat[i][j] = aux[cont];
+                                cont++;
+                            }
                         }
-                    }
-                    try {
-                        controlador.CompresionRLE(format, mat, width, height, max_value);
-                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    cont=0;
-                }
-                if ("P3".equals(info.get(0))) {
-                    format = "ppm";
-                    String temp;
-                    width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
-                    height = Character.getNumericValue(info.get(1).charAt(2));
-                    String[] val = info.get(2).split("\\s+");
-                    max_value = Integer.parseInt(val[0]);
-                    int aux[] = new int[height*width];
-                    int[][] mat = new int[height][width];
-                    
-                    for (int i = 3; i<info.size();i++) { 
-                        String[] parts = info.get(i).split("\\s+");
-                        for (int j = 0; j < parts.length; j++) {
-                            aux[cont] = Integer.parseInt(parts[j]);
-                            cont++;
+                        try {
+                            controlador.CompresionRLE(format, mat, width, height, max_value);
+                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                         }
+                        cont=0;
                     }
-                    cont=0;
-                    for (int i = 0; i<height;i++) { 
-                        for (int j = 0; j<width;j++) { 
-                            mat[i][j] = aux[cont];
-                            cont++;
+                    if ("P3".equals(info.get(0))) {
+                        format = "ppm";
+                        String temp;
+                        width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
+                        height = Character.getNumericValue(info.get(1).charAt(2));
+                        String[] val = info.get(2).split("\\s+");
+                        max_value = Integer.parseInt(val[0]);
+                        int aux[] = new int[height*width];
+                        int[][] mat = new int[height][width];
+                        
+                        for (int i = 3; i<info.size();i++) {
+                            String[] parts = info.get(i).split("\\s+");
+                            for (int j = 0; j < parts.length; j++) {
+                                aux[cont] = Integer.parseInt(parts[j]);
+                                cont++;
+                            }
                         }
+                        cont=0;
+                        for (int i = 0; i<height;i++) {
+                            for (int j = 0; j<width;j++) {
+                                mat[i][j] = aux[cont];
+                                cont++;
+                            }
+                        }
+                        try {
+                            controlador.CompresionRLE(format, mat, width, height, max_value);
+                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        cont=0;
                     }
-                    try {
-                        controlador.CompresionRLE(format, mat, width, height, max_value);
-                    } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                        Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    cont=0;
-                }
-            break;
-            default:
-                System.out.println("defecto");
+                    break;
+                default:
+                    System.out.println("defecto");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
             
     }//GEN-LAST:event_opcionActionPerformed
@@ -456,6 +524,60 @@ public class Frame extends javax.swing.JFrame {
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_guardarImagenActionPerformed
+
+    private void moreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreActionPerformed
+        if ("modificar brillo".equals(global_case)) {
+            img = controlador.ModificarBrilloMas(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+        if ("modificar contraste".equals(global_case)) {
+            img = controlador.ModificarContrasteMas(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+        if ("umbralización".equals(global_case)) {
+            try {
+                myimg = ImageIO.read(new File("imagen_original.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            umbral = umbral + 30;
+            img = controlador.UmbralizacionMas(myimg, umbral); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+    }//GEN-LAST:event_moreActionPerformed
+
+    private void lessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lessActionPerformed
+        if ("modificar brillo".equals(global_case)) {
+            img = controlador.ModificarBrilloMenos(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+        if ("modificar contraste".equals(global_case)) {
+            img = controlador.ModificarContrasteMenos(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+        if ("umbralización".equals(global_case)) {
+            try {
+                myimg = ImageIO.read(new File("imagen_original.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            umbral = umbral - 30;
+            img = controlador.UmbralizacionMas(myimg, umbral); // Se accede a la imagen desde el modelo.
+            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+            imagen.setIcon(new ImageIcon(imagenFinal));
+            Cuadro.add(imagen);
+        }
+    }//GEN-LAST:event_lessActionPerformed
 
     /**
      * @param args the command line arguments
@@ -497,6 +619,8 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JButton guardarImagen;
     private javax.swing.JLabel imagen;
     private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JButton less;
+    private javax.swing.JButton more;
     private javax.swing.JComboBox<String> opcion;
     // End of variables declaration//GEN-END:variables
 }
