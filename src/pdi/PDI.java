@@ -185,18 +185,84 @@ public class PDI {
     //modifica contraste
     public BufferedImage ModificarContrasteMas (BufferedImage img)
     {
-        Imagen.setImagenOrinal(img);
-        
         height = img.getHeight();
         width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
         
-        RescaleOp op = new RescaleOp(1.2f, 6.0f, null);
-        img = op.filter(img, img);
-        Imagen.setImagenTemporal(img);
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 < 128) {
+                    red-=30;
+                    green-=30;
+                    blue-=30;
+                    if (red<0) { red=0; }
+                    if (green<0) { green=0; }
+                    if (blue<0) { blue=0; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                } else {
+                    red+=30;
+                    green+=30;
+                    blue+=30;
+                    if (red>255) { red=255; }
+                    if (green>255) { green=255; }
+                    if (blue>255) { blue=255; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                
+            }
+        }
+        
         return img;
     }
     public BufferedImage ModificarContrasteMenos (BufferedImage img)
     {
+        height = img.getHeight();
+        width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+        
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 > 188) {
+                    red-=30;
+                    green-=30;
+                    blue-=30;
+                    if (red<0) { red=0; }
+                    if (green<0) { green=0; }
+                    if (blue<0) { blue=0; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                if ((red+green+blue)/3 < 68){
+                    red+=30;
+                    green+=30;
+                    blue+=30;
+                    if (red>255) { red=255; }
+                    if (green>255) { green=255; }
+                    if (blue>255) { blue=255; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                
+            }
+        }
         
         return img;
     }
@@ -219,7 +285,7 @@ public class PDI {
                 green = (pixel>>8)&0xff;
                 blue = pixel&0xff;
                 
-                if(red+green+blue < umbral)
+                if((red+green+blue)/3 < umbral)
                 {
                     red = BLACK;
                     green = BLACK;
@@ -256,7 +322,7 @@ public class PDI {
                 green = (pixel>>8)&0xff;
                 blue = pixel&0xff;
                 
-                if(red+green+blue < umbral)
+                if((red+green+blue)/3 < umbral)
                 {
                     red = BLACK;
                     green = BLACK;
