@@ -23,19 +23,29 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="Cuadro" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="164" max="-2" attributes="0"/>
               <Component id="guardarImagen" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jToggleButton1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="87" max="-2" attributes="0"/>
-              <Component id="opcion" pref="165" max="32767" attributes="0"/>
-              <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="Cuadro" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="more" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="less" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="opcion" pref="165" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="69" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -50,7 +60,12 @@
                   <Component id="jToggleButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="guardarImagen" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="83" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="more" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="less" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -100,12 +115,12 @@
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="7">
             <StringItem index="0" value="Original"/>
-            <StringItem index="1" value="Negativo"/>
-            <StringItem index="2" value="Escala de grises"/>
-            <StringItem index="3" value="Blanco y negro"/>
-            <StringItem index="4" value="Colores &#xfa;nicos"/>
-            <StringItem index="5" value="Rotaci&#xf3;n"/>
-            <StringItem index="6" value="Compresi&#xf3;n RLE"/>
+            <StringItem index="1" value="Mostrar Informaci&#xf3;n"/>
+            <StringItem index="2" value="Histograma"/>
+            <StringItem index="3" value="Modificar Brillo"/>
+            <StringItem index="4" value="Modificar Contraste"/>
+            <StringItem index="5" value="Umbralizaci&#xf3;n"/>
+            <StringItem index="6" value="Rotaci&#xf3;n"/>
           </StringArray>
         </Property>
       </Properties>
@@ -122,6 +137,22 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="guardarImagenActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="more">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="+"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="moreActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="less">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="-"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="lessActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

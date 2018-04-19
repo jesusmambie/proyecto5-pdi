@@ -5,8 +5,11 @@
 */
 package pdi;
 
+import java.util.Arrays;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.RescaleOp;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
@@ -18,6 +21,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.imageio.ImageIO;
@@ -42,6 +46,303 @@ public class PDI {
     
     private int pixel;
     private int maxGray;
+    
+    //returns image information in console
+    public void Information(BufferedImage img)
+    {
+        width = img.getWidth();
+        height = img.getHeight();
+        ColorModel model = img.getColorModel();
+        int bpp = model.getPixelSize();
+        Set<Integer> pixels = new HashSet<>();
+        for(int h=0; h<height; h++)
+        {
+            for(int w=0; w<width; w++)
+            {
+                pixel = img.getRGB(w, h);
+                if (!pixels.contains(pixel)) {
+                    pixels.add(pixel);
+                }
+            }
+        }
+        double diagonal_pixels = Math.sqrt(Math.pow(width,2)+Math.pow(height,2)); 
+        //pixels per inch are diagonal pixes / diagonal inches
+        //aun no tenemos diagonal inches
+        System.out.println("Dimensiones: "+width+"x"+height);
+        System.out.println("Bits por pixel: "+bpp);
+        System.out.println("Colores unicos: "+pixels.size());
+        System.out.println("Dots per inch: ");
+    }
+    
+    //exports histogram of image
+    public void Histograma(BufferedImage img) throws IOException
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+        BufferedImage histogram = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
+        int[] grays = new int[height*width];
+        int[] histogram_array = new int[256];
+        Arrays.fill(histogram_array, 0);
+        int i = 0, limit;
+        
+        for (int h = 0; h<height; h++) {
+            for (int w = 0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                gray = (red + green + blue)/3;
+                grays[i]=gray;
+                i++;
+            }
+        }
+        for (int j = 0; j<width*height; j++) {
+            histogram_array[grays[j]]++;
+        }
+        int max_value = Arrays.stream(histogram_array).max().getAsInt();
+        red = 255;
+        green = 255;
+        blue = 255;
+        int white_pixel =  (red<<16) | (green<<8) | blue;
+        for (i = 0; i<256; i++) {
+            for (int j = 0; j<256; j++) {
+                histogram.setRGB(i, j, white_pixel);
+            }
+        }
+        int value;
+        for (i = 0; i<255; i++) {
+            value = 255*histogram_array[i]/max_value;
+            limit = 255 - value;
+            for (int j = limit; j<255; j++) {
+                histogram.setRGB(i, j, 0);
+            }
+        }
+        
+        File f = new File("histogram.png");
+        ImageIO.write(histogram, "PNG", f);
+        System.out.println("Histogram saved in project directory");
+    }
+    
+    //modifica el brillo
+    public BufferedImage ModificarBrilloMas (BufferedImage img)
+    {   
+        height = img.getHeight();
+        width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+        
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                red+=30;
+                green+=30;
+                blue+=30;
+                if (red>255) { red=255; }
+                if (green>255) { green=255; }
+                if (blue>255) { blue=255; }
+                pixel =  (red<<16) | (green <<8) | blue;
+                img.setRGB(w, h, pixel);
+            }
+        }
+        
+        return img;
+    }
+    public BufferedImage ModificarBrilloMenos (BufferedImage img)
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+        
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                red-=30;
+                green-=30;
+                blue-=30;
+                if (red<0) { red=0; }
+                if (green<0) { green=0; }
+                if (blue<0) { blue=0; }
+                pixel =  (red<<16) | (green <<8) | blue;
+                img.setRGB(w, h, pixel);
+            }
+        }
+        
+        return img;
+    }
+    
+    //modifica contraste
+    public BufferedImage ModificarContrasteMas (BufferedImage img)
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+        
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 < 128) {
+                    red-=30;
+                    green-=30;
+                    blue-=30;
+                    if (red<0) { red=0; }
+                    if (green<0) { green=0; }
+                    if (blue<0) { blue=0; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                } else {
+                    red+=30;
+                    green+=30;
+                    blue+=30;
+                    if (red>255) { red=255; }
+                    if (green>255) { green=255; }
+                    if (blue>255) { blue=255; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                
+            }
+        }
+        
+        return img;
+    }
+    public BufferedImage ModificarContrasteMenos (BufferedImage img)
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+                pixel = img.getRGB(1, 1);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+        
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 > 188) {
+                    red-=30;
+                    green-=30;
+                    blue-=30;
+                    if (red<0) { red=0; }
+                    if (green<0) { green=0; }
+                    if (blue<0) { blue=0; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                if ((red+green+blue)/3 < 68){
+                    red+=30;
+                    green+=30;
+                    blue+=30;
+                    if (red>255) { red=255; }
+                    if (green>255) { green=255; }
+                    if (blue>255) { blue=255; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
+                
+            }
+        }
+        
+        return img;
+    }
+    
+    //umbralizar la imagen
+    public BufferedImage UmbralizacionMas (BufferedImage img, int umbral)
+    {   
+        final int BLACK = 0;
+        final int WHITE = 255;
+        
+        height = img.getHeight();
+        width = img.getWidth();
+        
+        for(int h=0; h<height; h++)
+        {
+            for(int w=0; w<width; w++)
+            {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 < umbral)
+                {
+                    red = BLACK;
+                    green = BLACK;
+                    blue = BLACK;
+                }else
+                {
+                    red = WHITE;
+                    green = WHITE;
+                    blue = WHITE;
+                }
+                
+                pixel =  (red<<16) | (green <<8) | blue;
+                
+                img.setRGB(w, h, pixel);
+            }
+        }
+        
+        return img;
+    }
+    public BufferedImage UmbralizacionMenos (BufferedImage img, int umbral)
+    {
+        final int BLACK = 0;
+        final int WHITE = 255;
+        
+        height = img.getHeight();
+        width = img.getWidth();
+        
+        for(int h=0; h<height; h++)
+        {
+            for(int w=0; w<width; w++)
+            {
+                pixel = img.getRGB(w, h);
+                red = (pixel>>16)&0xff;
+                green = (pixel>>8)&0xff;
+                blue = pixel&0xff;
+                
+                if((red+green+blue)/3 < umbral)
+                {
+                    red = BLACK;
+                    green = BLACK;
+                    blue = BLACK;
+                }else
+                {
+                    red = WHITE;
+                    green = WHITE;
+                    blue = WHITE;
+                }
+                
+                pixel =  (red<<16) | (green <<8) | blue;
+                
+                img.setRGB(w, h, pixel);
+            }
+        }
+        
+        return img;
+    }
+    
     // Convierte la imagen negativa.
     public BufferedImage FotoNegativa(BufferedImage img)
     {
