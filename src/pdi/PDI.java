@@ -43,9 +43,10 @@ public class PDI {
     private int green;
     private int blue;
     private int gray;
-    
     private int pixel;
     private int maxGray;
+    private float cantidad;
+    private float cantidad2;
     
     //returns image information in console
     public void Information(BufferedImage img)
@@ -125,57 +126,47 @@ public class PDI {
     }
     
     //modifica el brillo
-    public BufferedImage ModificarBrilloMas (BufferedImage img)
+    public BufferedImage ModificarBrillo (BufferedImage img, int nivel)
     {   
         height = img.getHeight();
         width = img.getWidth();
-                pixel = img.getRGB(1, 1);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
         
-        for(int h=0; h<height; h++) {
-            for(int w=0; w<width; w++) {
-                pixel = img.getRGB(w, h);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-                red+=30;
-                green+=30;
-                blue+=30;
-                if (red>255) { red=255; }
-                if (green>255) { green=255; }
-                if (blue>255) { blue=255; }
-                pixel =  (red<<16) | (green <<8) | blue;
-                img.setRGB(w, h, pixel);
+        if (nivel>0) {
+            cantidad = nivel*50;
+            for(int h=0; h<height; h++) {
+                for(int w=0; w<width; w++) {
+                    pixel = img.getRGB(w, h);
+                    red = (pixel>>16)&0xff;
+                    green = (pixel>>8)&0xff;
+                    blue = pixel&0xff;
+                    red+=cantidad;
+                    green+=cantidad;
+                    blue+=cantidad;
+                    if (red>255) { red=255; }
+                    if (green>255) { green=255; }
+                    if (blue>255) { blue=255; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
             }
-        }
-        
-        return img;
-    }
-    public BufferedImage ModificarBrilloMenos (BufferedImage img)
-    {
-        height = img.getHeight();
-        width = img.getWidth();
-                pixel = img.getRGB(1, 1);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-        
-        for(int h=0; h<height; h++) {
-            for(int w=0; w<width; w++) {
-                pixel = img.getRGB(w, h);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-                red-=30;
-                green-=30;
-                blue-=30;
-                if (red<0) { red=0; }
-                if (green<0) { green=0; }
-                if (blue<0) { blue=0; }
-                pixel =  (red<<16) | (green <<8) | blue;
-                img.setRGB(w, h, pixel);
+        }else{
+            nivel = Math.abs(nivel);
+            cantidad = nivel*50;
+            for(int h=0; h<height; h++) {
+                for(int w=0; w<width; w++) {
+                    pixel = img.getRGB(w, h);
+                    red = (pixel>>16)&0xff;
+                    green = (pixel>>8)&0xff;
+                    blue = pixel&0xff;
+                    red-=cantidad;
+                    green-=cantidad;
+                    blue-=cantidad;
+                    if (red<0) { red=0; }
+                    if (green<0) { green=0; }
+                    if (blue<0) { blue=0; }
+                    pixel =  (red<<16) | (green <<8) | blue;
+                    img.setRGB(w, h, pixel);
+                }
             }
         }
         
@@ -183,130 +174,82 @@ public class PDI {
     }
     
     //modifica contraste
-    public BufferedImage ModificarContrasteMas (BufferedImage img)
+    public BufferedImage ModificarContraste (BufferedImage img, int nivel_contraste)
     {
         height = img.getHeight();
         width = img.getWidth();
-                pixel = img.getRGB(1, 1);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
+        System.out.println(nivel_contraste);
         
-        for(int h=0; h<height; h++) {
-            for(int w=0; w<width; w++) {
-                pixel = img.getRGB(w, h);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-                
-                if((red+green+blue)/3 < 128) {
-                    red-=30;
-                    green-=30;
-                    blue-=30;
-                    if (red<0) { red=0; }
-                    if (green<0) { green=0; }
-                    if (blue<0) { blue=0; }
-                    pixel =  (red<<16) | (green <<8) | blue;
-                    img.setRGB(w, h, pixel);
-                } else {
-                    red+=30;
-                    green+=30;
-                    blue+=30;
-                    if (red>255) { red=255; }
-                    if (green>255) { green=255; }
-                    if (blue>255) { blue=255; }
-                    pixel =  (red<<16) | (green <<8) | blue;
-                    img.setRGB(w, h, pixel);
+        if (nivel_contraste>0) {
+            cantidad = (float) (1 + (nivel_contraste*0.2));
+            cantidad2 = (float) (1 - (nivel_contraste*0.2));
+            System.out.println("nivel contraste: "+nivel_contraste+" cantidad: "+cantidad+" cantidad2: "+cantidad2);
+            for(int h=0; h<height; h++) {
+                for(int w=0; w<width; w++) {
+                    pixel = img.getRGB(w, h);
+                    red = (pixel>>16)&0xff;
+                    green = (pixel>>8)&0xff;
+                    blue = pixel&0xff;
+                    if((red+green+blue)/3 < 128) {
+                        red=(int) (red*cantidad2);
+                        green=(int) (green*cantidad2);
+                        blue=(int) (blue*cantidad2);
+                        if (red<0) { red=0; }
+                        if (green<0) { green=0; }
+                        if (blue<0) { blue=0; }
+                        pixel =  (red<<16) | (green <<8) | blue;
+                        img.setRGB(w, h, pixel);
+                    } else {
+                        red=(int) (red*cantidad);
+                        green=(int) (green*cantidad);
+                        blue=(int) (blue*cantidad);
+                        if (red>255) { red=255; }
+                        if (green>255) { green=255; }
+                        if (blue>255) { blue=255; }
+                        pixel =  (red<<16) | (green <<8) | blue;
+                        img.setRGB(w, h, pixel);
+                    }
                 }
-                
+            }
+        }else{
+            nivel_contraste = Math.abs(nivel_contraste);
+            cantidad = (float) (1 + (nivel_contraste*0.2));
+            cantidad2 = (float) (1 - (nivel_contraste*0.2));
+            System.out.println("nivel contraste: "+nivel_contraste+" cantidad: "+cantidad+" cantidad2: "+cantidad2);
+            for(int h=0; h<height; h++) {
+                for(int w=0; w<width; w++) {
+                    pixel = img.getRGB(w, h);
+                    red = (pixel>>16)&0xff;
+                    green = (pixel>>8)&0xff;
+                    blue = pixel&0xff;
+                    if((red+green+blue)/3 < 128) {
+                        red=(int) (red*cantidad);
+                        green=(int) (green*cantidad);
+                        blue=(int) (blue*cantidad);
+                        if (red>128) { red=128; }
+                        if (green>128) { green=128; }
+                        if (blue>128) { blue=128; }
+                        pixel =  (red<<16) | (green <<8) | blue;
+                        img.setRGB(w, h, pixel);
+                    } else {
+                        red=(int) (red*cantidad2);
+                        green=(int) (green*cantidad2);
+                        blue=(int) (blue*cantidad2);
+                        if (red<128) { red=128; }
+                        if (green<128) { green=128; }
+                        if (blue<128) { blue=128; }
+                        pixel =  (red<<16) | (green <<8) | blue;
+                        img.setRGB(w, h, pixel);
+                    }
+                }
             }
         }
-        
-        return img;
-    }
-    public BufferedImage ModificarContrasteMenos (BufferedImage img)
-    {
-        height = img.getHeight();
-        width = img.getWidth();
-                pixel = img.getRGB(1, 1);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-        
-        for(int h=0; h<height; h++) {
-            for(int w=0; w<width; w++) {
-                pixel = img.getRGB(w, h);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-                
-                if((red+green+blue)/3 > 188) {
-                    red-=30;
-                    green-=30;
-                    blue-=30;
-                    if (red<0) { red=0; }
-                    if (green<0) { green=0; }
-                    if (blue<0) { blue=0; }
-                    pixel =  (red<<16) | (green <<8) | blue;
-                    img.setRGB(w, h, pixel);
-                }
-                if ((red+green+blue)/3 < 68){
-                    red+=30;
-                    green+=30;
-                    blue+=30;
-                    if (red>255) { red=255; }
-                    if (green>255) { green=255; }
-                    if (blue>255) { blue=255; }
-                    pixel =  (red<<16) | (green <<8) | blue;
-                    img.setRGB(w, h, pixel);
-                }
-                
-            }
-        }
-        
         return img;
     }
     
     //umbralizar la imagen
-    public BufferedImage UmbralizacionMas (BufferedImage img, int umbral)
+    public BufferedImage Umbralizacion (BufferedImage img, int umbral)
     {   
-        final int BLACK = 0;
-        final int WHITE = 255;
-        
-        height = img.getHeight();
-        width = img.getWidth();
-        
-        for(int h=0; h<height; h++)
-        {
-            for(int w=0; w<width; w++)
-            {
-                pixel = img.getRGB(w, h);
-                red = (pixel>>16)&0xff;
-                green = (pixel>>8)&0xff;
-                blue = pixel&0xff;
-                
-                if((red+green+blue)/3 < umbral)
-                {
-                    red = BLACK;
-                    green = BLACK;
-                    blue = BLACK;
-                }else
-                {
-                    red = WHITE;
-                    green = WHITE;
-                    blue = WHITE;
-                }
-                
-                pixel =  (red<<16) | (green <<8) | blue;
-                
-                img.setRGB(w, h, pixel);
-            }
-        }
-        
-        return img;
-    }
-    public BufferedImage UmbralizacionMenos (BufferedImage img, int umbral)
-    {
         final int BLACK = 0;
         final int WHITE = 255;
         
@@ -346,7 +289,7 @@ public class PDI {
     // Convierte la imagen negativa.
     public BufferedImage FotoNegativa(BufferedImage img)
     {
-        Imagen.setImagenOrinal(img);
+        Imagen.setImagenOrginal(img);
         
         height = img.getHeight();
         width = img.getWidth();
@@ -376,7 +319,7 @@ public class PDI {
     //Convierte la imagen a escala de grises
     public BufferedImage FotoEscalaGrises(BufferedImage img)
     {
-        Imagen.setImagenOrinal(img);
+        Imagen.setImagenOrginal(img);
         
         height = img.getHeight();
         width = img.getWidth();
@@ -404,41 +347,31 @@ public class PDI {
     // Convierte la imagen en blanco y negro.
     public BufferedImage FotoBlancoNegro(BufferedImage img) throws IOException
     {
-        Imagen.setImagenOrinal(img);
-        
+        Imagen.setImagenOrginal(img);
         final int BLACK = 0;
         final int WHITE = 255;
-        
         height = img.getHeight();
         width = img.getWidth();
         
-        for(int h=0; h<height; h++)
-        {
-            for(int w=0; w<width; w++)
-            {
+        for(int h=0; h<height; h++) {
+            for(int w=0; w<width; w++) {
                 pixel = img.getRGB(w, h);
                 red = (pixel>>16)&0xff;
                 green = (pixel>>8)&0xff;
                 blue = pixel&0xff;
-                
-                if(red+green+blue < 128)
-                {
+                if((red+green+blue)/3 < 128) {
                     red = BLACK;
                     green = BLACK;
                     blue = BLACK;
-                }else
-                {
+                }else {
                     red = WHITE;
                     green = WHITE;
                     blue = WHITE;
                 }
-                
                 pixel =  (red<<16) | (green <<8) | blue;
-                
                 img.setRGB(w, h, pixel);
             }
         }
-        
         Imagen.setImagenTemporal(img);
         return img;
     }
@@ -470,7 +403,7 @@ public class PDI {
                 
                 // Guardar imagen blanco y negro.
             case 2:
-                BufferedImage img = Imagen.getImagenOrinal();
+                BufferedImage img = Imagen.getImagenOrginal();
                 final int BLACK = 0;
                 final int WHITE = 255;
                 
@@ -792,7 +725,7 @@ public class PDI {
         return b;
     }
     
-    // Lee caracteres de un archivo netbmp ignorando espacios.
+    // Lee caracteres de un archivo Netpbm ignorando espacios.
     private static char LeerCaracter( InputStream archivo ) throws IOException{
         char c;
         c = (char) LeerByte( archivo );
@@ -830,8 +763,8 @@ public class PDI {
         return 0xff000000 | ( r << 16 ) | ( g << 8 ) | b;
     }
       
-    // Lectura de todas las imágines Netbmp.
-    public BufferedImage Netbmp(String tipoNetbmp, String ruta) throws FileNotFoundException, IOException{
+    // Lectura de todas las imágines Netpbm.
+    public BufferedImage Netpbm(String tipoNetpbm, String ruta) throws FileNotFoundException, IOException{
                 
         BufferedImage img = null;
         InputStream entrada = new FileInputStream(ruta);
@@ -851,7 +784,7 @@ public class PDI {
             c = reader.readLine();
             if(!(c.contains("#") || c.contains("P")))
             {
-                if(tipoNetbmp.toLowerCase().equalsIgnoreCase( "pgm") || tipoNetbmp.toLowerCase().equalsIgnoreCase( "ppm"))
+                if(tipoNetpbm.toLowerCase().equalsIgnoreCase( "pgm") || tipoNetpbm.toLowerCase().equalsIgnoreCase( "ppm"))
                    maxGray = getMaximoGris(reader);
                 chunks = c.split("\\s+");
                 for(int j = 0; j < chunks.length; j++)
@@ -866,7 +799,7 @@ public class PDI {
         }
         
         int q;
-        switch(tipoNetbmp.toLowerCase())
+        switch(tipoNetpbm.toLowerCase())
         {
             case "ppm":
                 img = new BufferedImage(width*3, height, BufferedImage.TYPE_INT_RGB);

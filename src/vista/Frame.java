@@ -41,9 +41,61 @@ public class Frame extends javax.swing.JFrame {
     BufferedImage img = null;
     BufferedImage myimg = null;
     Image imagenFinal;
-    int umbral = 128;
-    int aux = 1;
+    int umbral;
+    int nivel_brillo;
+    int nivel_contraste;
 
+    void setImagenCargada (BufferedImage image) {
+        File f = new File("imagen_cargada.png");
+        try {
+            ImageIO.write(image, "PNG", f);
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    void setImagenOriginal (BufferedImage image) {
+        File f = new File("imagen_original.png");
+        try {
+            ImageIO.write(image, "PNG", f);
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    void setImagenTemporal (BufferedImage image) {
+        File f = new File("imagen_temporal.png");
+        try {
+            ImageIO.write(image, "PNG", f);
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    BufferedImage getImagenCargada () {
+        BufferedImage result = null;
+        try {
+            result = ImageIO.read(new File("imagen_cargada.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+    BufferedImage getImagenOriginal () {
+        BufferedImage result = null;
+        try {
+            result = ImageIO.read(new File("imagen_original.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
+    BufferedImage getImagenTemporal () {
+        BufferedImage result = null;
+        try {
+            result = ImageIO.read(new File("imagen_temporal.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return result;
+    }
     /**
      * Creates new form Frame
      */
@@ -101,7 +153,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Original", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Rotación" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Rotación" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -176,6 +228,9 @@ public class Frame extends javax.swing.JFrame {
     @SuppressWarnings("empty-statement")
     private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         
+        umbral = 128;
+        nivel_brillo = 0;
+        nivel_contraste = 0;
         more.setEnabled(false);
         less.setEnabled(false);
         PDI c = new PDI();
@@ -196,7 +251,7 @@ public class Frame extends javax.swing.JFrame {
             int tamannoExt = path.length();
             String ext = path.substring(tamannoExt-3); // Se lee la extensión.
             
-            // Si se carga una imagen netbmp se trata de otra forma.
+            // Si se carga una imagen Netpbm se trata de otra forma.
             if(!ext.equalsIgnoreCase("bmp")) try {
                 if (ext.equals("rle")) {
                     bandera = true;
@@ -229,7 +284,7 @@ public class Frame extends javax.swing.JFrame {
                             String helper = currentDirFile.getAbsolutePath();
                             helper.substring(0, helper.length() - 1);
 
-                            img = pdi.Netbmp("pbm", helper +"/bitmap.pbm");
+                            img = pdi.Netpbm("pbm", helper +"/bitmap.pbm");
                         }
                         if (info.get(0).equals("P2")) {
                             String format = "pgm";
@@ -253,7 +308,7 @@ public class Frame extends javax.swing.JFrame {
                             String helper = currentDirFile.getAbsolutePath();
                             helper.substring(0, helper.length() - 1);
 
-                            img = pdi.Netbmp("pbm", helper +"/bitmap.pgm");
+                            img = pdi.Netpbm("pbm", helper +"/bitmap.pgm");
                         }
                         if (info.get(0).equals("P3")) {
                             String format = "ppm";
@@ -277,7 +332,7 @@ public class Frame extends javax.swing.JFrame {
                             String helper = currentDirFile.getAbsolutePath();
                             helper.substring(0, helper.length() - 1);
 
-                            img = pdi.Netbmp("pbm", helper +"/bitmap.ppm");
+                            img = pdi.Netpbm("pbm", helper +"/bitmap.ppm");
                         }
                         
                 } else {
@@ -292,7 +347,7 @@ public class Frame extends javax.swing.JFrame {
                             info.add(line);
                         }
 
-                    img = pdi.Netbmp(ext, path);            // Buffer de la imagen Netbmp.
+                    img = pdi.Netpbm(ext, path);            // Buffer de la imagen Netpbm.
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
@@ -300,24 +355,19 @@ public class Frame extends javax.swing.JFrame {
             
             try {
                 URL url = new File(path).toURI().toURL();
-                if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
+                if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netpbm se obvia esta asignación.
                 imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             } catch (MalformedURLException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Imagen.setImagenOrinal(img); // Se guarda la imagen en el modelo
-            File f = new File("imagen_original.png");
-            try {
-                ImageIO.write(Imagen.getImagenOrinal(), "PNG", f);
-            } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            setImagenCargada(img);
+            setImagenOriginal(img);
+            setImagenTemporal(img);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
             Cuadro.setVisible(true);
-            
         } //if the user click on save in Jfilechooser
         else if (result == JFileChooser.CANCEL_OPTION) {
             System.out.println("No File Select");
@@ -335,42 +385,62 @@ public class Frame extends javax.swing.JFrame {
             boolean[] tipoGuardado = {false,false,false};
             switch(caso)
             {
+                case "deshacer cambios":
+                    more.setEnabled(false);
+                    less.setEnabled(false);
+                    img = getImagenCargada();
+                    setImagenOriginal(img);
+                    setImagenTemporal(img);
+                    umbral = 128;
+                    nivel_brillo = 0;
+                    nivel_contraste = 0;
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    break;
                 case "mostrar información":
                     more.setEnabled(false);
                     less.setEnabled(false);
-                    controlador.Information(Imagen.getImagenOrinal());
+                    setImagenOriginal(getImagenTemporal());
+                    controlador.Information(Imagen.getImagenOrginal());
                     break;
                 case "histograma":
                     more.setEnabled(false);
                     less.setEnabled(false);
-                    controlador.Histograma((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal()));
+                    setImagenOriginal(getImagenTemporal());
+                    controlador.Histograma(getImagenOriginal());
                     break;
                 case "modificar brillo":
                     more.setEnabled(true);
                     less.setEnabled(true);
+                    setImagenOriginal(getImagenTemporal());
                     break;
                 case "modificar contraste":
                     more.setEnabled(true);
                     less.setEnabled(true);
+                    setImagenOriginal(getImagenTemporal());
                     break;
                 case "umbralización":
                     more.setEnabled(true);
                     less.setEnabled(true);
-                    break;
-                case "original":
-                    more.setEnabled(false);
-                    less.setEnabled(false);
-                    img = Imagen.getImagenOrinal();
+                    setImagenOriginal(getImagenTemporal());
+                    tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
+                    tipoGuardado[0]=false;
+                    tipoGuardado[1]=false;
+                    Imagen.setTipoGuardado(tipoGuardado);
+                    img = getImagenOriginal();
+                    img = controlador.FotoBlancoNegro(myimg);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
+                    setImagenTemporal(img);
                     break;
                 case "negativo":
                     tipoGuardado[0]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
                     tipoGuardado[1]=false;
                     tipoGuardado[2]=false;
                     Imagen.setTipoGuardado(tipoGuardado);
-                    img = controlador.FotoNegativa(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                    img = controlador.FotoNegativa(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
@@ -380,7 +450,7 @@ public class Frame extends javax.swing.JFrame {
                     tipoGuardado[0]=false;
                     tipoGuardado[2]=false;
                     Imagen.setTipoGuardado(tipoGuardado);
-                    img = controlador.FotoEscalaGrises(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                    img = controlador.FotoEscalaGrises(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
@@ -390,23 +460,21 @@ public class Frame extends javax.swing.JFrame {
                     tipoGuardado[0]=false;
                     tipoGuardado[1]=false;
                     Imagen.setTipoGuardado(tipoGuardado);
-                    {
                         try {
-                            img = controlador.FotoBlancoNegro(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+                            img = controlador.FotoBlancoNegro(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
                         } catch (IOException ex) {
                             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    }
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
                     break;
                 case "colores únicos":
-                    controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
+                    controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrginal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
                     break;
                 case "rotación":
                     BufferedImage imgTemp;
-                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrinal()) : (Imagen.getImagenTemporal());
+                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrginal()) : (Imagen.getImagenTemporal());
                     img = controlador.FotoRotacion(imgTemp);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
@@ -527,55 +595,62 @@ public class Frame extends javax.swing.JFrame {
 
     private void moreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreActionPerformed
         if ("modificar brillo".equals(global_case)) {
-            img = controlador.ModificarBrilloMas(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (nivel_brillo+1 > 5) { nivel_brillo=5; } else { nivel_brillo++; }
+            img = controlador.ModificarBrillo(myimg, nivel_brillo); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
         if ("modificar contraste".equals(global_case)) {
-            img = controlador.ModificarContrasteMas(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (nivel_contraste+1 > 4) { nivel_contraste=4; } else { nivel_contraste++; }
+            img = controlador.ModificarContraste(myimg, nivel_contraste); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
         if ("umbralización".equals(global_case)) {
-            try {
-                myimg = ImageIO.read(new File("imagen_original.png"));
-            } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            umbral = umbral + 30;
-            img = controlador.UmbralizacionMas(myimg, umbral); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (umbral+30>248) { umbral = 248; } else { umbral=umbral+30; }
+            img = controlador.Umbralizacion(myimg, umbral); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
     }//GEN-LAST:event_moreActionPerformed
 
     private void lessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lessActionPerformed
         if ("modificar brillo".equals(global_case)) {
-            img = controlador.ModificarBrilloMenos(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (nivel_brillo-1 < -5) { nivel_brillo=-5; } else { nivel_brillo--; }
+            img = controlador.ModificarBrillo(myimg, nivel_brillo); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
         if ("modificar contraste".equals(global_case)) {
-            img = controlador.ModificarContrasteMenos(Imagen.getImagenOrinal()); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (nivel_contraste-1 < -4) { nivel_contraste=-4; } else { nivel_contraste--; }
+            System.out.println(nivel_contraste);
+            img = controlador.ModificarContraste(myimg, nivel_contraste); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
         if ("umbralización".equals(global_case)) {
-            try {
-                myimg = ImageIO.read(new File("imagen_original.png"));
-            } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            umbral = umbral - 30;
-            img = controlador.UmbralizacionMas(myimg, umbral); // Se accede a la imagen desde el modelo.
+            myimg = getImagenOriginal();
+            if (umbral-30<8) { umbral = 8; } else { umbral=umbral-30; }
+            img = controlador.Umbralizacion(myimg, umbral); // Se accede a la imagen desde el modelo.
             imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
             imagen.setIcon(new ImageIcon(imagenFinal));
             Cuadro.add(imagen);
+            setImagenTemporal(img);
         }
     }//GEN-LAST:event_lessActionPerformed
 
