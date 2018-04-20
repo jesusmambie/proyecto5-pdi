@@ -153,7 +153,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Rotación" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -428,8 +428,17 @@ public class Frame extends javax.swing.JFrame {
                     tipoGuardado[0]=false;
                     tipoGuardado[1]=false;
                     Imagen.setTipoGuardado(tipoGuardado);
-                    img = getImagenOriginal();
+                    myimg = getImagenOriginal();
                     img = controlador.FotoBlancoNegro(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "filtro promedio":
+                    myimg = getImagenOriginal();
+                    int [] array = {-7,7,-7,7};
+                    img = controlador.FiltroPromedio(myimg, array);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);

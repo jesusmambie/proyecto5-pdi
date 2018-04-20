@@ -183,7 +183,6 @@ public class PDI {
         if (nivel_contraste>0) {
             cantidad = (float) (1 + (nivel_contraste*0.2));
             cantidad2 = (float) (1 - (nivel_contraste*0.2));
-            System.out.println("nivel contraste: "+nivel_contraste+" cantidad: "+cantidad+" cantidad2: "+cantidad2);
             for(int h=0; h<height; h++) {
                 for(int w=0; w<width; w++) {
                     pixel = img.getRGB(w, h);
@@ -215,7 +214,6 @@ public class PDI {
             nivel_contraste = Math.abs(nivel_contraste);
             cantidad = (float) (1 + (nivel_contraste*0.2));
             cantidad2 = (float) (1 - (nivel_contraste*0.2));
-            System.out.println("nivel contraste: "+nivel_contraste+" cantidad: "+cantidad+" cantidad2: "+cantidad2);
             for(int h=0; h<height; h++) {
                 for(int w=0; w<width; w++) {
                     pixel = img.getRGB(w, h);
@@ -283,6 +281,106 @@ public class PDI {
             }
         }
         
+        return img;
+    }
+    
+    public BufferedImage FiltroMediana(BufferedImage img, int[] kernel) 
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+        int index, avg_red, avg_green, avg_blue;
+        for (int h = 0; h<height; h++) {
+            for (int w = 0; w<width; w++) {
+                index=0;
+                avg_red = 0;
+                avg_green = 0;
+                avg_blue = 0;
+                for (int i=kernel[0];i<kernel[1]+1;i++) {
+                    //System.out.println("comparando "+w+" con "+i);
+                    if (w+i>=0 && w+i<width) {
+                        //System.out.println("Haciendo get w: "+w+" h: "+h);
+                        pixel = img.getRGB(w+i, h);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        avg_red+=red;
+                        avg_green+=green;
+                        avg_blue+=blue;
+                        index++;
+                    }
+                }
+                for (int i=kernel[2];i<kernel[3]+1;i++) {
+                    //System.out.println("comparando "+h+" con "+i);
+                    if (h+i>=0 && h+i<height && i!=0) {
+                        //System.out.println("Haciendo get w: "+w+" h: "+h);
+                        pixel = img.getRGB(w, h+i);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        avg_red+=red;
+                        avg_green+=green;
+                        avg_blue+=blue;
+                        index++;
+                    }
+                }
+                avg_red = avg_red / index;
+                avg_green = avg_green / index;
+                avg_blue = avg_blue / index;
+                pixel = (avg_red<<16) | (avg_green <<8) | avg_blue;
+                img.setRGB(w, h, pixel);
+            }
+        }
+        System.out.println("termino");
+        return img;
+    }
+    
+    public BufferedImage FiltroPromedio(BufferedImage img, int[] kernel) 
+    {
+        height = img.getHeight();
+        width = img.getWidth();
+        int index, avg_red, avg_green, avg_blue;
+        for (int h = 0; h<height; h++) {
+            for (int w = 0; w<width; w++) {
+                index=0;
+                avg_red = 0;
+                avg_green = 0;
+                avg_blue = 0;
+                for (int i=kernel[0];i<kernel[1]+1;i++) {
+                    //System.out.println("comparando "+w+" con "+i);
+                    if (w+i>=0 && w+i<width) {
+                        //System.out.println("Haciendo get w: "+w+" h: "+h);
+                        pixel = img.getRGB(w+i, h);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        avg_red+=red;
+                        avg_green+=green;
+                        avg_blue+=blue;
+                        index++;
+                    }
+                }
+                for (int i=kernel[2];i<kernel[3]+1;i++) {
+                    //System.out.println("comparando "+h+" con "+i);
+                    if (h+i>=0 && h+i<height && i!=0) {
+                        //System.out.println("Haciendo get w: "+w+" h: "+h);
+                        pixel = img.getRGB(w, h+i);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        avg_red+=red;
+                        avg_green+=green;
+                        avg_blue+=blue;
+                        index++;
+                    }
+                }
+                avg_red = avg_red / index;
+                avg_green = avg_green / index;
+                avg_blue = avg_blue / index;
+                pixel = (avg_red<<16) | (avg_green <<8) | avg_blue;
+                img.setRGB(w, h, pixel);
+            }
+        }
+        System.out.println("termino");
         return img;
     }
     

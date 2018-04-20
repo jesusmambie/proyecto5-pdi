@@ -120,7 +120,7 @@
             <StringItem index="3" value="Modificar Brillo"/>
             <StringItem index="4" value="Modificar Contraste"/>
             <StringItem index="5" value="Umbralizaci&#xf3;n"/>
-            <StringItem index="6" value="Rotaci&#xf3;n"/>
+            <StringItem index="6" value="Filtro promedio"/>
           </StringArray>
         </Property>
       </Properties>
