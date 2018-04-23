@@ -155,7 +155,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio", "Filtro mediana", "Filtro Gaussiano", "Prewitt Relieve", "Prewitt B&W", "Sobel Relieve", "Sobel B&W" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio", "Filtro mediana", "Filtro Gaussiano", "Prewitt Relieve", "Prewitt B&W", "Sobel Relieve", "Sobel B&W", "Roberts Relieve", "Roberts B&W" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -499,6 +499,22 @@ public class Frame extends javax.swing.JFrame {
                 case "sobel b&w":
                     myimg = getImagenOriginal();
                     img = controlador.FiltroSobelBW(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "roberts relieve":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroRoberts(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "roberts b&w":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroRobertsBW(myimg);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
