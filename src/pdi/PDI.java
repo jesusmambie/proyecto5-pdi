@@ -178,7 +178,6 @@ public class PDI {
     {
         height = img.getHeight();
         width = img.getWidth();
-        System.out.println(nivel_contraste);
         
         if (nivel_contraste>0) {
             cantidad = (float) (1 + (nivel_contraste*0.2));
@@ -283,59 +282,113 @@ public class PDI {
         
         return img;
     }
+    public int[] getLimits (String kernel) {
+        int[] limits = new int [4];
+        switch (kernel) {
+            case "1x2" :
+                limits = new int[] {0,1,0,0};
+            break;
+            case "2x1" :
+                limits = new int[] {0,0,0,1};
+            break;
+            case "1x3" :
+                limits = new int[] {0,2,0,0};
+            break;
+            case "3x1" :
+                limits = new int[] {0,0,0,2};
+            break;
+            case "3x3" :
+                limits = new int[] {-1,1,-1,1};
+            break;
+            case "1x5" :
+                limits = new int[] {0,4,0,0};
+            break;
+            case "5x1" :
+                limits = new int[] {0,0,0,4};
+            break;
+            case "5x5" :
+                limits = new int[] {-2,2,-2,2};
+            break;
+            case "1x7" :
+                limits = new int[] {0,6,0,0};
+            break;
+            case "7x1" :
+                limits = new int[] {0,0,0,6};
+            break;
+            case "7x7" :
+                limits = new int[] {-3,3,-3,3};
+            break;
+        }
+        return limits;
+    }
     
-    public BufferedImage FiltroMediana(BufferedImage img, int[] kernel) 
+    public int GetMediana(int[] array, int size) {
+        int mediana, aux;
+        if (size%2==0){
+            aux = (array[size/2]+array[(size/2)-1])/2;
+            mediana = aux;
+        } else {
+            aux = (int)size/2;
+            mediana = array[aux];
+        }
+        return mediana;
+    }
+    public BufferedImage FiltroMediana(BufferedImage img, String type) 
     {
+        int [] kernel = getLimits(type);
         height = img.getHeight();
         width = img.getWidth();
-        int index, avg_red, avg_green, avg_blue;
+        int index;
+        int[] red_values = new int[13];
+        int[] green_values = new int[13];
+        int[] blue_values = new int[13];
         for (int h = 0; h<height; h++) {
             for (int w = 0; w<width; w++) {
                 index=0;
-                avg_red = 0;
-                avg_green = 0;
-                avg_blue = 0;
+                red = 0;
+                green = 0;
+                blue = 0;
                 for (int i=kernel[0];i<kernel[1]+1;i++) {
-                    //System.out.println("comparando "+w+" con "+i);
                     if (w+i>=0 && w+i<width) {
-                        //System.out.println("Haciendo get w: "+w+" h: "+h);
                         pixel = img.getRGB(w+i, h);
                         red = (pixel>>16)&0xff;
                         green = (pixel>>8)&0xff;
                         blue = pixel&0xff;
-                        avg_red+=red;
-                        avg_green+=green;
-                        avg_blue+=blue;
+                        red_values[index] = red;
+                        green_values[index] = green;
+                        blue_values[index] = blue;
                         index++;
                     }
                 }
                 for (int i=kernel[2];i<kernel[3]+1;i++) {
-                    //System.out.println("comparando "+h+" con "+i);
                     if (h+i>=0 && h+i<height && i!=0) {
-                        //System.out.println("Haciendo get w: "+w+" h: "+h);
                         pixel = img.getRGB(w, h+i);
                         red = (pixel>>16)&0xff;
                         green = (pixel>>8)&0xff;
                         blue = pixel&0xff;
-                        avg_red+=red;
-                        avg_green+=green;
-                        avg_blue+=blue;
+                        red_values[index] = red;
+                        green_values[index] = green;
+                        blue_values[index] = blue;
                         index++;
                     }
                 }
-                avg_red = avg_red / index;
-                avg_green = avg_green / index;
-                avg_blue = avg_blue / index;
-                pixel = (avg_red<<16) | (avg_green <<8) | avg_blue;
+                Arrays.sort(red_values);
+                Arrays.sort(green_values);
+                Arrays.sort(blue_values);
+                red = GetMediana(red_values, index);
+                green = GetMediana(green_values, index);
+                blue = GetMediana(blue_values, index);
+                pixel = (red<<16) | (green <<8) | blue;
                 img.setRGB(w, h, pixel);
             }
         }
-        System.out.println("termino");
         return img;
     }
     
-    public BufferedImage FiltroPromedio(BufferedImage img, int[] kernel) 
+    public BufferedImage FiltroPromedio(BufferedImage img, String type) 
     {
+        int [] kernel = new int [4];
+        kernel = getLimits(type);
         height = img.getHeight();
         width = img.getWidth();
         int index, avg_red, avg_green, avg_blue;
@@ -346,9 +399,7 @@ public class PDI {
                 avg_green = 0;
                 avg_blue = 0;
                 for (int i=kernel[0];i<kernel[1]+1;i++) {
-                    //System.out.println("comparando "+w+" con "+i);
                     if (w+i>=0 && w+i<width) {
-                        //System.out.println("Haciendo get w: "+w+" h: "+h);
                         pixel = img.getRGB(w+i, h);
                         red = (pixel>>16)&0xff;
                         green = (pixel>>8)&0xff;
@@ -360,9 +411,7 @@ public class PDI {
                     }
                 }
                 for (int i=kernel[2];i<kernel[3]+1;i++) {
-                    //System.out.println("comparando "+h+" con "+i);
                     if (h+i>=0 && h+i<height && i!=0) {
-                        //System.out.println("Haciendo get w: "+w+" h: "+h);
                         pixel = img.getRGB(w, h+i);
                         red = (pixel>>16)&0xff;
                         green = (pixel>>8)&0xff;
@@ -380,8 +429,531 @@ public class PDI {
                 img.setRGB(w, h, pixel);
             }
         }
-        System.out.println("termino");
         return img;
+    }
+    
+    public BufferedImage FiltroGaussiano(BufferedImage img, String type) {
+        
+        int [] kernel = getLimits(type);
+        height = img.getHeight();
+        width = img.getWidth();
+        int index, avg_red, avg_green, avg_blue;
+        int[] gauss = new int[108];
+        for (int h = 0; h<height; h++) {
+            for (int w = 0; w<width; w++) {
+                index=0;
+                avg_red = 0;
+                avg_green = 0;
+                avg_blue = 0;
+                for (int i=kernel[0];i<kernel[1]+1;i++) {
+                    if (w+i>=0 && w+i<width) {
+                        pixel = img.getRGB(w+i, h);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        
+                        if (kernel[1]==0){
+                            index = 1;
+                        }
+                        // 3 columnas
+                        if (kernel[1] == 1) {    
+                            if (i == -1 || i == 1) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 2;
+                                avg_green += green * 2;
+                                avg_blue += blue * 2;
+                                index += 2;
+                            }
+                        }
+                        
+                        // 5 columnas
+                        if (kernel[1] == 2) {
+                            if (i == -2 || i == 2) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == -1 || i == 1) {
+                                avg_red += red * 4;
+                                avg_green += green * 4;
+                                avg_blue += blue * 4;
+                                index += 4;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 6;
+                                avg_green += green * 6;
+                                avg_blue += blue * 6;
+                                index += 6;
+                            }
+                        }
+                        
+                        // 7 columnas 
+                        if (kernel[1] == 3) {
+                            
+                            if (i == -3 || i == 3) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == -2 || i == 2) {
+                                avg_red += red * 6;
+                                avg_green += green * 6;
+                                avg_blue += blue * 6;
+                                index += 6;
+                            }
+                            if (i == -1 || i == 1) {
+                                avg_red += red * 15;
+                                avg_green += green * 15;
+                                avg_blue += blue * 15;
+                                index += 15;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 20;
+                                avg_green += green * 20;
+                                avg_blue += blue * 20;
+                                index += 20;
+                            }
+                        }
+                    }
+                }
+                for (int i=kernel[2];i<kernel[3]+1;i++) {
+                    if (h+i>=0 && h+i<height && i!=0) {
+                        pixel = img.getRGB(w, h+i);
+                        red = (pixel>>16)&0xff;
+                        green = (pixel>>8)&0xff;
+                        blue = pixel&0xff;
+                        
+                        if (kernel[3]==0){
+                            index = 1;
+                        }
+                        // 3 filas
+                        if (kernel[3] == 1) {    
+                            if (i == -1 || i == 1) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 2;
+                                avg_green += green * 2;
+                                avg_blue += blue * 2;
+                                index += 2;
+                            }
+                        }
+                        
+                        // 5 filas
+                        if (kernel[3] == 2) {
+                            if (i == -2 || i == 2) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == -1 || i == 1) {
+                                avg_red += red * 4;
+                                avg_green += green * 4;
+                                avg_blue += blue * 4;
+                                index += 4;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 6;
+                                avg_green += green * 6;
+                                avg_blue += blue * 6;
+                                index += 6;
+                            }
+                        }
+                        
+                        // 7 filas
+                        if (kernel[3] == 3) {
+                            
+                            if (i == -3 || i == 3) {
+                                avg_red += red;
+                                avg_green += green;
+                                avg_blue += blue;
+                                index += 1;
+                            }
+                            if (i == -2 || i == 2) {
+                                avg_red += red * 6;
+                                avg_green += green * 6;
+                                avg_blue += blue * 6;
+                                index += 6;
+                            }
+                            if (i == -1 || i == 1) {
+                                avg_red += red * 15;
+                                avg_green += green * 15;
+                                avg_blue += blue * 15;
+                                index += 15;
+                            }
+                            if (i == 0) {
+                                avg_red += red * 20;
+                                avg_green += green * 20;
+                                avg_blue += blue * 20;
+                                index += 20;
+                            }
+                        }
+                    }
+                }
+                avg_red = avg_red / index;
+                avg_green = avg_green / index;
+                avg_blue = avg_blue / index;
+                pixel = (avg_red<<16) | (avg_green <<8) | avg_blue;
+                img.setRGB(w, h, pixel);
+            }
+        }
+        return img;
+    }
+    
+    public BufferedImage FiltroPrewitt(BufferedImage img) 
+    {
+        BufferedImage imagen = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        height = img.getHeight();
+        width = img.getWidth();
+        int superior_gray = 0;
+        int white =  (255<<16) | (255<<8) | 255;
+        int g =  (128<<16) | (128<<8) | 128;
+        int index, total_red, total_green, total_blue;
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                imagen.setRGB(w, h, 0);
+            }
+        }    
+        
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                total_red = 0;
+                total_green = 0;
+                total_blue = 0;
+                
+                //inferior izquierdo+
+                if (w-1>=0 && h+1<height) {
+                    pixel = img.getRGB(w-1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray = (total_red+total_green+total_blue);
+                }
+                //inferior+
+                if (h+1<height) {
+                    pixel = img.getRGB(w, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                //iferior derecho+
+                if (w+1<width && h+1<height) {
+                    pixel = img.getRGB(w+1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                
+                //superior izquierdo
+                if (w-1>=0 && h-1>=0) {
+                    pixel = img.getRGB(w-1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray = (total_red+total_green+total_blue);
+                }
+                //superior
+                if (h-1>=0) {
+                    pixel = img.getRGB(w, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                //superior derecho
+                if (w+1<width && h-1>=0) {
+                    pixel = img.getRGB(w+1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                gray = gray/9;
+                superior_gray = superior_gray/9;
+                int check = gray-superior_gray;
+                
+                if (check > 0) {
+                    imagen.setRGB(w, h, white);
+                }
+                if (check < 15 && check > -15) {
+                    imagen.setRGB(w, h, g);
+                }
+            }
+        }
+        return imagen;
+    }
+    
+        public BufferedImage FiltroPrewittBW(BufferedImage img) 
+    {
+        BufferedImage imagen = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        height = img.getHeight();
+        width = img.getWidth();
+        int superior_gray = 0;
+        int white =  (255<<16) | (255<<8) | 255;
+        int g =  (128<<16) | (128<<8) | 128;
+        int index, total_red, total_green, total_blue;
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                imagen.setRGB(w, h, 0);
+            }
+        }    
+        
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                total_red = 0;
+                total_green = 0;
+                total_blue = 0;
+                
+                //inferior izquierdo+
+                if (w-1>=0 && h+1<height) {
+                    pixel = img.getRGB(w-1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray = (total_red+total_green+total_blue);
+                }
+                //inferior+
+                if (h+1<height) {
+                    pixel = img.getRGB(w, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                //iferior derecho+
+                if (w+1<width && h+1<height) {
+                    pixel = img.getRGB(w+1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                
+                //superior izquierdo
+                if (w-1>=0 && h-1>=0) {
+                    pixel = img.getRGB(w-1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray = (total_red+total_green+total_blue);
+                }
+                //superior
+                if (h-1>=0) {
+                    pixel = img.getRGB(w, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                //superior derecho
+                if (w+1<width && h-1>=0) {
+                    pixel = img.getRGB(w+1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                gray = gray/9;
+                superior_gray = superior_gray/9;
+                int check = gray-superior_gray;
+                
+                if (check > 20) {
+                    imagen.setRGB(w, h, white);
+                }
+            }
+        }
+        return imagen;
+    }
+    
+    public BufferedImage FiltroSobel(BufferedImage img) 
+    {
+        BufferedImage imagen = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        height = img.getHeight();
+        width = img.getWidth();
+        int gray_superior = 0, gray_inferior = 0;
+        int superior_gray = 0;
+        int pixel2 = 0;
+        int black = 0;
+        int white =  (255<<16) | (255<<8) | 255;
+        int g =  (128<<16) | (128<<8) | 128;
+        int index, total_red, total_green, total_blue;
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                imagen.setRGB(w, h, 0);
+            }
+        }  
+        
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                total_red = 0;
+                total_green = 0;
+                total_blue = 0;
+                
+                //inferior izquierdo+
+                if (w-1>=0 && h+1<height) {
+                    pixel = img.getRGB(w-1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray = (total_red+total_green+total_blue);
+                }
+                //inferior+
+                if (h+1<height) {
+                    pixel = img.getRGB(w, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                    gray += total_red+total_green+total_blue;
+                }
+                //iferior derecho+
+                if (w+1<width && h+1<height) {
+                    pixel = img.getRGB(w+1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                
+                //superior izquierdo
+                if (w-1>=0 && h-1>=0) {
+                    pixel = img.getRGB(w-1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray = (total_red+total_green+total_blue);
+                }
+                //superior
+                if (h-1>=0) {
+                    pixel = img.getRGB(w, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                //superior derecho
+                if (w+1<width && h-1>=0) {
+                    pixel = img.getRGB(w+1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                gray = gray/11;
+                superior_gray = superior_gray/11;
+                int check = gray-superior_gray;
+                
+                if (check > 0) {
+                    imagen.setRGB(w, h, white);
+                }
+                if (check < 15 && check > -15) {
+                    imagen.setRGB(w, h, g);
+                }
+
+            }
+        }
+        return imagen;
+    }
+    
+    public BufferedImage FiltroSobelBW(BufferedImage img) 
+    {
+        BufferedImage imagen = new BufferedImage(img.getWidth(), img.getHeight(), img.getType());
+        height = img.getHeight();
+        width = img.getWidth();
+        int gray_superior = 0, gray_inferior = 0;
+        int superior_gray = 0;
+        int pixel2 = 0;
+        int black = 0;
+        int white =  (255<<16) | (255<<8) | 255;
+        int g =  (128<<16) | (128<<8) | 128;
+        int index, total_red, total_green, total_blue;
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                imagen.setRGB(w, h, 0);
+            }
+        }  
+        
+        for (int h = 1; h<height-1; h++) {
+            for (int w = 1; w<width-1; w++) {
+                total_red = 0;
+                total_green = 0;
+                total_blue = 0;
+                
+                //inferior izquierdo+
+                if (w-1>=0 && h+1<height) {
+                    pixel = img.getRGB(w-1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray = (total_red+total_green+total_blue);
+                }
+                //inferior+
+                if (h+1<height) {
+                    pixel = img.getRGB(w, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                    gray += total_red+total_green+total_blue;
+                }
+                //iferior derecho+
+                if (w+1<width && h+1<height) {
+                    pixel = img.getRGB(w+1, h+1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    gray += total_red+total_green+total_blue;
+                }
+                
+                //superior izquierdo
+                if (w-1>=0 && h-1>=0) {
+                    pixel = img.getRGB(w-1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray = (total_red+total_green+total_blue);
+                }
+                //superior
+                if (h-1>=0) {
+                    pixel = img.getRGB(w, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                //superior derecho
+                if (w+1<width && h-1>=0) {
+                    pixel = img.getRGB(w+1, h-1);
+                    total_red = (pixel>>16)&0xff;
+                    total_green = (pixel>>8)&0xff;
+                    total_blue = pixel&0xff;
+                    superior_gray += total_red+total_green+total_blue;
+                }
+                gray = gray/11;
+                superior_gray = superior_gray/11;
+                int check = gray-superior_gray;
+                
+                if (check > 15) {
+                    imagen.setRGB(w, h, white);
+                }
+            }
+        }
+        return imagen;
     }
     
     // Convierte la imagen negativa.

@@ -44,6 +44,7 @@ public class Frame extends javax.swing.JFrame {
     int umbral;
     int nivel_brillo;
     int nivel_contraste;
+    String kernel = "1x2";
 
     void setImagenCargada (BufferedImage image) {
         File f = new File("imagen_cargada.png");
@@ -119,6 +120,7 @@ public class Frame extends javax.swing.JFrame {
         guardarImagen = new javax.swing.JButton();
         more = new javax.swing.JButton();
         less = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -153,7 +155,7 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio" }));
+        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio", "Filtro mediana", "Filtro Gaussiano", "Prewitt Relieve", "Prewitt B&W", "Sobel Relieve", "Sobel B&W" }));
         opcion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 opcionActionPerformed(evt);
@@ -181,6 +183,13 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1x2", "2x1", "3x1", "1x3", "3x3", "5x1", "1x5", "5x5", "7x1", "1x7", "7x7" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -194,16 +203,19 @@ public class Frame extends javax.swing.JFrame {
                 .addComponent(guardarImagen)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jToggleButton1)
-                .addGap(87, 87, 87)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(87, 87, 87)
                         .addComponent(more)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(less)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(opcion, 0, 165, Short.MAX_VALUE)
-                        .addGap(69, 69, 69))))
+                        .addGap(18, 18, 18)
+                        .addComponent(opcion, 0, 167, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(57, 57, 57))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -214,7 +226,8 @@ public class Frame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jToggleButton1)
-                    .addComponent(guardarImagen))
+                    .addComponent(guardarImagen)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(more)
@@ -402,7 +415,7 @@ public class Frame extends javax.swing.JFrame {
                     more.setEnabled(false);
                     less.setEnabled(false);
                     setImagenOriginal(getImagenTemporal());
-                    controlador.Information(Imagen.getImagenOrginal());
+                    controlador.Information(getImagenOriginal());
                     break;
                 case "histograma":
                     more.setEnabled(false);
@@ -437,8 +450,55 @@ public class Frame extends javax.swing.JFrame {
                     break;
                 case "filtro promedio":
                     myimg = getImagenOriginal();
-                    int [] array = {-7,7,-7,7};
-                    img = controlador.FiltroPromedio(myimg, array);
+                    img = controlador.FiltroPromedio(myimg, kernel);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "filtro mediana":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroMediana(myimg, kernel);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "filtro gaussiano":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroGaussiano(myimg, kernel);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "prewitt relieve":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroPrewitt(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "sobel relieve":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroSobel(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "prewitt b&w":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroPrewittBW(myimg);
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                    imagen.setIcon(new ImageIcon(imagenFinal));
+                    Cuadro.add(imagen);
+                    setImagenTemporal(img);
+                    break;
+                case "sobel b&w":
+                    myimg = getImagenOriginal();
+                    img = controlador.FiltroSobelBW(myimg);
                     imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
                     imagen.setIcon(new ImageIcon(imagenFinal));
                     Cuadro.add(imagen);
@@ -663,6 +723,10 @@ public class Frame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_lessActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        kernel = jComboBox1.getSelectedItem().toString();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -702,6 +766,7 @@ public class Frame extends javax.swing.JFrame {
     private javax.swing.JPanel Cuadro;
     private javax.swing.JButton guardarImagen;
     private javax.swing.JLabel imagen;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JButton less;
     private javax.swing.JButton more;
