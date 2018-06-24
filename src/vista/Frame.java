@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,7 +21,6 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import modelo.Imagen;
 import pdi.PDI;
 
 /**
@@ -31,29 +29,19 @@ import pdi.PDI;
  */
 public class Frame extends javax.swing.JFrame {
 
-    private PDI pdi = new PDI();
+    private final PDI pdi = new PDI();
     private int height = 0;
     private int width = 0;
     private int max_value = 255;
-    private ArrayList<String> info = new ArrayList<>();
+    private final ArrayList<String> info = new ArrayList<>();
     private String global_case;
     PDI controlador = new PDI();
     BufferedImage img = null;
     BufferedImage myimg = null;
+    BufferedImage myimg2 = null;
     Image imagenFinal;
-    int umbral;
-    int nivel_brillo;
-    int nivel_contraste;
-    String kernel = "1x2";
+    int count = 1;
 
-    void setImagenCargada (BufferedImage image) {
-        File f = new File("imagen_cargada.png");
-        try {
-            ImageIO.write(image, "PNG", f);
-        } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
     void setImagenOriginal (BufferedImage image) {
         File f = new File("imagen_original.png");
         try {
@@ -61,23 +49,6 @@ public class Frame extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    void setImagenTemporal (BufferedImage image) {
-        File f = new File("imagen_temporal.png");
-        try {
-            ImageIO.write(image, "PNG", f);
-        } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    BufferedImage getImagenCargada () {
-        BufferedImage result = null;
-        try {
-            result = ImageIO.read(new File("imagen_cargada.png"));
-        } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return result;
     }
     BufferedImage getImagenOriginal () {
         BufferedImage result = null;
@@ -88,10 +59,18 @@ public class Frame extends javax.swing.JFrame {
         }
         return result;
     }
-    BufferedImage getImagenTemporal () {
+    void setImagenOriginal2 (BufferedImage image) {
+        File f = new File("imagen_original2.png");
+        try {
+            ImageIO.write(image, "PNG", f);
+        } catch (IOException ex) {
+            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    BufferedImage getImagenOriginal2 () {
         BufferedImage result = null;
         try {
-            result = ImageIO.read(new File("imagen_temporal.png"));
+            result = ImageIO.read(new File("imagen_original2.png"));
         } catch (IOException ex) {
             Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -115,78 +94,89 @@ public class Frame extends javax.swing.JFrame {
 
         Cuadro = new javax.swing.JPanel();
         imagen = new javax.swing.JLabel();
+        label1 = new java.awt.Label();
+        label2 = new java.awt.Label();
+        imagen1 = new javax.swing.JLabel();
+        imagen2 = new javax.swing.JLabel();
+        out = new javax.swing.JLabel();
+        jToggleButton3 = new javax.swing.JToggleButton();
         jToggleButton1 = new javax.swing.JToggleButton();
-        opcion = new javax.swing.JComboBox<>();
-        guardarImagen = new javax.swing.JButton();
-        more = new javax.swing.JButton();
-        less = new javax.swing.JButton();
-        jComboBox1 = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        imagen.setText("jLabel1");
+        imagen.setText("in");
+
+        label1.setText("label1");
+
+        label2.setText("label2");
+
+        out.setText("out");
 
         javax.swing.GroupLayout CuadroLayout = new javax.swing.GroupLayout(Cuadro);
         Cuadro.setLayout(CuadroLayout);
         CuadroLayout.setHorizontalGroup(
             CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(CuadroLayout.createSequentialGroup()
-                .addGap(196, 196, 196)
-                .addComponent(imagen, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(38, 38, 38)
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 402, Short.MAX_VALUE)
+                .addComponent(label2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(332, 332, 332))
+            .addGroup(CuadroLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(imagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(out, javax.swing.GroupLayout.PREFERRED_SIZE, 487, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(CuadroLayout.createSequentialGroup()
+                    .addGap(22, 22, 22)
+                    .addComponent(imagen1, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(537, Short.MAX_VALUE)))
+            .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(CuadroLayout.createSequentialGroup()
+                    .addGap(32, 32, 32)
+                    .addComponent(imagen2, javax.swing.GroupLayout.PREFERRED_SIZE, 436, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(527, Short.MAX_VALUE)))
         );
         CuadroLayout.setVerticalGroup(
             CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(CuadroLayout.createSequentialGroup()
-                .addGap(70, 70, 70)
-                .addComponent(imagen, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(79, Short.MAX_VALUE))
+                .addGap(25, 25, 25)
+                .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(label2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(24, 24, 24)
+                .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(imagen, javax.swing.GroupLayout.DEFAULT_SIZE, 483, Short.MAX_VALUE)
+                    .addComponent(out, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
+            .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, CuadroLayout.createSequentialGroup()
+                    .addContainerGap(150, Short.MAX_VALUE)
+                    .addComponent(imagen1, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGap(3, 3, 3)))
+            .addGroup(CuadroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, CuadroLayout.createSequentialGroup()
+                    .addContainerGap(141, Short.MAX_VALUE)
+                    .addComponent(imagen2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap()))
         );
 
-        jToggleButton1.setText("Cargar");
+        label1.getAccessibleContext().setAccessibleName("In Image");
+        label2.getAccessibleContext().setAccessibleName("dmskmd");
+
+        jToggleButton3.setText("Load");
+        jToggleButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton3ActionPerformed(evt);
+            }
+        });
+
+        jToggleButton1.setText("Clouds Remover");
         jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleButton1ActionPerformed(evt);
-            }
-        });
-        jToggleButton1.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                jToggleButton1KeyPressed(evt);
-            }
-        });
-
-        opcion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Deshacer cambios", "Mostrar Información", "Histograma", "Modificar Brillo", "Modificar Contraste", "Umbralización", "Filtro promedio", "Filtro mediana", "Filtro Gaussiano", "Prewitt Relieve", "Prewitt B&W", "Sobel Relieve", "Sobel B&W", "Roberts Relieve", "Roberts B&W" }));
-        opcion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                opcionActionPerformed(evt);
-            }
-        });
-
-        guardarImagen.setText("Guardar");
-        guardarImagen.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                guardarImagenActionPerformed(evt);
-            }
-        });
-
-        more.setText("+");
-        more.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                moreActionPerformed(evt);
-            }
-        });
-
-        less.setText("-");
-        less.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                lessActionPerformed(evt);
-            }
-        });
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1x2", "2x1", "3x1", "1x3", "3x3", "5x1", "1x5", "5x5", "7x1", "1x7", "7x7" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
             }
         });
 
@@ -196,159 +186,51 @@ public class Frame extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(164, 164, 164)
-                .addComponent(guardarImagen)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jToggleButton1)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(87, 87, 87)
-                        .addComponent(more)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(less)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(opcion, 0, 167, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(57, 57, 57))))
+                        .addGap(61, 61, 61)
+                        .addComponent(jToggleButton3)
+                        .addGap(31, 31, 31)
+                        .addComponent(jToggleButton1))
+                    .addComponent(Cuadro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(9, 9, 9)
                 .addComponent(Cuadro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(3, 3, 3)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(opcion, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jToggleButton1)
-                    .addComponent(guardarImagen)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(more)
-                    .addComponent(less))
-                .addGap(42, 42, 42))
+                    .addComponent(jToggleButton3)
+                    .addComponent(jToggleButton1))
+                .addGap(38, 38, 38))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    @SuppressWarnings("empty-statement")
-    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        
-        umbral = 128;
-        nivel_brillo = 0;
-        nivel_contraste = 0;
-        more.setEnabled(false);
-        less.setEnabled(false);
+    private void jToggleButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton3ActionPerformed
         PDI c = new PDI();
         boolean bandera = false;
         JFileChooser file = new JFileChooser();
         file.setCurrentDirectory(new File(System.getProperty("user.home")));
         
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "bpm", "gif", "png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("*.Images", "jpg");
         file.addChoosableFileFilter(filter);
         int result = file.showSaveDialog(null);
-        
-        if (result == JFileChooser.APPROVE_OPTION) {
-            
-            BufferedImage img = null;
-            Image imagenFinal = null;
-            File selectedFile = file.getSelectedFile();
-            String path = selectedFile.getAbsolutePath();
-            int tamannoExt = path.length();
-            String ext = path.substring(tamannoExt-3); // Se lee la extensión.
-            
-            // Si se carga una imagen Netpbm se trata de otra forma.
-            if(!ext.equalsIgnoreCase("bmp")) try {
-                if (ext.equals("rle")) {
-                    bandera = true;
-                    FileReader reader = null;
-                    String line = null;
-                    File read = file.getSelectedFile();
-                    reader = new FileReader(read);
-                    BufferedReader bufferedReader = new BufferedReader(reader);
-                
-                        while((line = bufferedReader.readLine()) != null) {
-                            info.add(line);
-                        }
-                        if (info.get(0).equals("P1")) {
-                            String format = "pbm";
-                            width = Character.getNumericValue(info.get(1).charAt(0));
-                            height = Character.getNumericValue(info.get(1).charAt(2));
-                            String ar[] = info.get(2).split("\\s+");
-                            int array[] = new int[ar.length];
-                            for (int i = 0; i< ar.length; i++) {
-                                array[i] = Integer.parseInt(ar[i]);
-                            }
-                            System.out.println(format);
-                            System.out.println(width + " " +height);
-                            for (int i = 0; i< ar.length; i++) {
-                                System.out.println(array[i] + " ");
-                            }
-                            System.out.println();
-                            c.CargarRLE(format, array, width, height, 0);
-                            File currentDirFile = new File("");
-                            String helper = currentDirFile.getAbsolutePath();
-                            helper.substring(0, helper.length() - 1);
+        if (count == 1) {
+            if (result == JFileChooser.APPROVE_OPTION) {
 
-                            img = pdi.Netpbm("pbm", helper +"/bitmap.pbm");
-                        }
-                        if (info.get(0).equals("P2")) {
-                            String format = "pgm";
-                            width = Character.getNumericValue(info.get(1).charAt(0));
-                            height = Character.getNumericValue(info.get(1).charAt(2));
-                            String[] val = info.get(2).split("\\s+");
-                            max_value = Integer.parseInt(val[0]);
-                            String ar[] = info.get(3).split("\\s+");
-                            int array[] = new int[ar.length];
-                            for (int i = 0; i< ar.length; i++) {
-                                array[i] = Integer.parseInt(ar[i]);
-                            }
-                            System.out.println(format);
-                            System.out.println(width + " " +height);
-                            for (int i = 0; i< ar.length; i++) {
-                                System.out.println(array[i] + " ");
-                            }
-                            System.out.println();
-                            c.CargarRLE(format, array, width, height, max_value);
-                            File currentDirFile = new File("");
-                            String helper = currentDirFile.getAbsolutePath();
-                            helper.substring(0, helper.length() - 1);
+                BufferedImage img = null;
+                Image imagenFinal = null;
+                File selectedFile = file.getSelectedFile();
+                String path = selectedFile.getAbsolutePath();
+                int tamannoExt = path.length();
+                String ext = path.substring(tamannoExt-3); // Se lee la extensión.
 
-                            img = pdi.Netpbm("pbm", helper +"/bitmap.pgm");
-                        }
-                        if (info.get(0).equals("P3")) {
-                            String format = "ppm";
-                            width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
-                            height = Character.getNumericValue(info.get(1).charAt(2));
-                            String[] val = info.get(2).split("\\s+");
-                            max_value = Integer.parseInt(val[0]);
-                            String ar[] = info.get(3).split("\\s+");
-                            int array[] = new int[ar.length];
-                            for (int i = 0; i< ar.length; i++) {
-                                array[i] = Integer.parseInt(ar[i]);
-                            }
-                            System.out.println(format);
-                            System.out.println(width + " " +height);
-                            for (int i = 0; i< ar.length; i++) {
-                                System.out.println(array[i] + " ");
-                            }
-                            System.out.println();
-                            c.CargarRLE(format, array, width, height, max_value);
-                            File currentDirFile = new File("");
-                            String helper = currentDirFile.getAbsolutePath();
-                            helper.substring(0, helper.length() - 1);
-
-                            img = pdi.Netpbm("pbm", helper +"/bitmap.ppm");
-                        }
-                        
-                } else {
+                // Si se carga una imagen netbmp se trata de otra forma.
+                if(!(ext.equalsIgnoreCase("bmp") || ext.equalsIgnoreCase("jpg"))) try {
                     bandera = true;
                     FileReader reader = null;
                     String line = null;
@@ -356,392 +238,87 @@ public class Frame extends javax.swing.JFrame {
                     reader = new FileReader(read);
                     BufferedReader bufferedReader = new BufferedReader(reader);
 
-                        while((line = bufferedReader.readLine()) != null) {
-                            info.add(line);
-                        }
-
-                    img = pdi.Netpbm(ext, path);            // Buffer de la imagen Netpbm.
+                    while((line = bufferedReader.readLine()) != null) {
+                        info.add(line);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+
+                try {
+                    URL url = new File(path).toURI().toURL();
+                    if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setImagenOriginal(img);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+                Cuadro.setVisible(true);
+
+            } //if the user click on save in Jfilechooser
+            else if (result == JFileChooser.CANCEL_OPTION) {
+                System.out.println("No File Select");
             }
-            
-            try {
-                URL url = new File(path).toURI().toURL();
-                if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netpbm se obvia esta asignación.
-                imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+        } else { //count = 2, loading second image
+            if (result == JFileChooser.APPROVE_OPTION) {
+
+                BufferedImage img = null;
+                Image imagenFinal = null;
+                File selectedFile = file.getSelectedFile();
+                String path = selectedFile.getAbsolutePath();
+                int tamannoExt = path.length();
+                String ext = path.substring(tamannoExt-3); // Se lee la extensión.
+
+                // Si se carga una imagen netbmp se trata de otra forma.
+                if(!(ext.equalsIgnoreCase("bmp") || ext.equalsIgnoreCase("jpg"))) try {
+                    bandera = true;
+                    FileReader reader = null;
+                    String line = null;
+                    File read = file.getSelectedFile();
+                    reader = new FileReader(read);
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+
+                    while((line = bufferedReader.readLine()) != null) {
+                        info.add(line);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                try {
+                    URL url = new File(path).toURI().toURL();
+                    if (img == null && bandera == false) img = ImageIO.read(url);   // Si se leyó una Netbmp se obvia esta asignación.
+                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                setImagenOriginal2(img);
+                imagen.setIcon(new ImageIcon(imagenFinal));
+                Cuadro.add(imagen);
+                Cuadro.setVisible(true);
+
+            } //if the user click on save in Jfilechooser
+            else if (result == JFileChooser.CANCEL_OPTION) {
+                System.out.println("No File Select");
             }
-            setImagenCargada(img);
-            setImagenOriginal(img);
-            setImagenTemporal(img);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            Cuadro.setVisible(true);
-        } //if the user click on save in Jfilechooser
-        else if (result == JFileChooser.CANCEL_OPTION) {
-            System.out.println("No File Select");
         }
+        count = 2;
+    }//GEN-LAST:event_jToggleButton3ActionPerformed
+
+    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+        myimg = getImagenOriginal();
+        myimg2 = getImagenOriginal2();
+        img = controlador.CloudsRemover(myimg, myimg2);
+        imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
+        imagen.setIcon(new ImageIcon(imagenFinal));
+        Cuadro.add(imagen);
     }//GEN-LAST:event_jToggleButton1ActionPerformed
-
-    private void jToggleButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jToggleButton1KeyPressed
-        // 
-    }//GEN-LAST:event_jToggleButton1KeyPressed
-
-    private void opcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_opcionActionPerformed
-        try {
-            String caso = opcion.getSelectedItem().toString().toLowerCase(); // Obtengo la opción del combo box.
-            global_case = caso;
-            boolean[] tipoGuardado = {false,false,false};
-            switch(caso)
-            {
-                case "deshacer cambios":
-                    more.setEnabled(false);
-                    less.setEnabled(false);
-                    img = getImagenCargada();
-                    setImagenOriginal(img);
-                    setImagenTemporal(img);
-                    umbral = 128;
-                    nivel_brillo = 0;
-                    nivel_contraste = 0;
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    break;
-                case "mostrar información":
-                    more.setEnabled(false);
-                    less.setEnabled(false);
-                    setImagenOriginal(getImagenTemporal());
-                    controlador.Information(getImagenOriginal());
-                    break;
-                case "histograma":
-                    more.setEnabled(false);
-                    less.setEnabled(false);
-                    setImagenOriginal(getImagenTemporal());
-                    controlador.Histograma(getImagenOriginal());
-                    break;
-                case "modificar brillo":
-                    more.setEnabled(true);
-                    less.setEnabled(true);
-                    setImagenOriginal(getImagenTemporal());
-                    break;
-                case "modificar contraste":
-                    more.setEnabled(true);
-                    less.setEnabled(true);
-                    setImagenOriginal(getImagenTemporal());
-                    break;
-                case "umbralización":
-                    more.setEnabled(true);
-                    less.setEnabled(true);
-                    setImagenOriginal(getImagenTemporal());
-                    tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                    tipoGuardado[0]=false;
-                    tipoGuardado[1]=false;
-                    Imagen.setTipoGuardado(tipoGuardado);
-                    myimg = getImagenOriginal();
-                    img = controlador.FotoBlancoNegro(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "filtro promedio":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroPromedio(myimg, kernel);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "filtro mediana":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroMediana(myimg, kernel);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "filtro gaussiano":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroGaussiano(myimg, kernel);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "prewitt relieve":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroPrewitt(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "sobel relieve":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroSobel(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "prewitt b&w":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroPrewittBW(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "sobel b&w":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroSobelBW(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "roberts relieve":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroRoberts(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "roberts b&w":
-                    myimg = getImagenOriginal();
-                    img = controlador.FiltroRobertsBW(myimg);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    setImagenTemporal(img);
-                    break;
-                case "negativo":
-                    tipoGuardado[0]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                    tipoGuardado[1]=false;
-                    tipoGuardado[2]=false;
-                    Imagen.setTipoGuardado(tipoGuardado);
-                    img = controlador.FotoNegativa(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    break;
-                case "escala de grises":
-                    tipoGuardado[1]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                    tipoGuardado[0]=false;
-                    tipoGuardado[2]=false;
-                    Imagen.setTipoGuardado(tipoGuardado);
-                    img = controlador.FotoEscalaGrises(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    break;
-                case "blanco y negro":
-                    tipoGuardado[2]=true;       // bool para saber qué imagen guardaré en la opción "Guardar".
-                    tipoGuardado[0]=false;
-                    tipoGuardado[1]=false;
-                    Imagen.setTipoGuardado(tipoGuardado);
-                        try {
-                            img = controlador.FotoBlancoNegro(Imagen.getImagenOrginal()); // Se accede a la imagen desde el modelo.
-                        } catch (IOException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    break;
-                case "colores únicos":
-                    controlador.FotoColoresUnicos((Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrginal()) : (Imagen.getImagenTemporal())); // Se accede a la imagen desde el modelo.
-                    break;
-                case "rotación":
-                    BufferedImage imgTemp;
-                    imgTemp = (Imagen.getImagenTemporal() == null) ? (Imagen.getImagenOrginal()) : (Imagen.getImagenTemporal());
-                    img = controlador.FotoRotacion(imgTemp);
-                    imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-                    imagen.setIcon(new ImageIcon(imagenFinal));
-                    Cuadro.add(imagen);
-                    break;
-                case "compresión rle":
-                    
-                    int cont = 0;
-                    String format;
-                    if ("P1".equals(info.get(0))) {
-                        format = "pbm";
-                        width = Character.getNumericValue(info.get(1).charAt(0));
-                        height = Character.getNumericValue(info.get(1).charAt(2));
-                        int aux[] = new int[height*width];
-                        int[][] mat = new int[height][width];
-                        for (int i = 2; i<info.size();i++) {
-                            for (int j = 0; j< info.get(i).length(); j++) {
-                                if (info.get(i).charAt(j) != ' ') {
-                                    aux[cont] = Character.getNumericValue(info.get(i).charAt(j));
-                                    cont++;
-                                }
-                            }
-                        }
-                        cont=0;
-                        for (int i = 0; i<height;i++) {
-                            for (int j = 0; j<width;j++) {
-                                mat[i][j] = aux[cont];
-                                cont++;
-                            }
-                        }
-                        try {
-                            controlador.CompresionRLE(format, mat, width, height, max_value);
-                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        cont=0;
-                    }
-                    if ("P2".equals(info.get(0))) {
-                        format = "pgm";
-                        String temp;
-                        width = Character.getNumericValue(info.get(1).charAt(0));
-                        height = Character.getNumericValue(info.get(1).charAt(2));
-                        String[] val = info.get(2).split("\\s+");
-                        max_value = Integer.parseInt(val[0]);
-                        int aux[] = new int[height*width];
-                        int[][] mat = new int[height][width];
-                        
-                        for (int i = 3; i<info.size();i++) {
-                            String[] parts = info.get(i).split("\\s+");
-                            for (int j = 0; j < parts.length; j++) {
-                                aux[cont] = Integer.parseInt(parts[j]);
-                                cont++;
-                            }
-                        }
-                        cont=0;
-                        for (int i = 0; i<height;i++) {
-                            for (int j = 0; j<width;j++) {
-                                mat[i][j] = aux[cont];
-                                cont++;
-                            }
-                        }
-                        try {
-                            controlador.CompresionRLE(format, mat, width, height, max_value);
-                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        cont=0;
-                    }
-                    if ("P3".equals(info.get(0))) {
-                        format = "ppm";
-                        String temp;
-                        width = (Character.getNumericValue(info.get(1).charAt(0)))*3;
-                        height = Character.getNumericValue(info.get(1).charAt(2));
-                        String[] val = info.get(2).split("\\s+");
-                        max_value = Integer.parseInt(val[0]);
-                        int aux[] = new int[height*width];
-                        int[][] mat = new int[height][width];
-                        
-                        for (int i = 3; i<info.size();i++) {
-                            String[] parts = info.get(i).split("\\s+");
-                            for (int j = 0; j < parts.length; j++) {
-                                aux[cont] = Integer.parseInt(parts[j]);
-                                cont++;
-                            }
-                        }
-                        cont=0;
-                        for (int i = 0; i<height;i++) {
-                            for (int j = 0; j<width;j++) {
-                                mat[i][j] = aux[cont];
-                                cont++;
-                            }
-                        }
-                        try {
-                            controlador.CompresionRLE(format, mat, width, height, max_value);
-                        } catch (FileNotFoundException | UnsupportedEncodingException ex) {
-                            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                        cont=0;
-                    }
-                    break;
-                default:
-                    System.out.println("defecto");
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            
-    }//GEN-LAST:event_opcionActionPerformed
-
-    private void guardarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_guardarImagenActionPerformed
-        PDI controlador = new PDI();
-        try {
-            controlador.GuardarImagen(Imagen.getImagenTemporal());
-        } catch (IOException ex) {
-            Logger.getLogger(Frame.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_guardarImagenActionPerformed
-
-    private void moreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreActionPerformed
-        if ("modificar brillo".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (nivel_brillo+1 > 5) { nivel_brillo=5; } else { nivel_brillo++; }
-            img = controlador.ModificarBrillo(myimg, nivel_brillo); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-        if ("modificar contraste".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (nivel_contraste+1 > 4) { nivel_contraste=4; } else { nivel_contraste++; }
-            img = controlador.ModificarContraste(myimg, nivel_contraste); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-        if ("umbralización".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (umbral+30>248) { umbral = 248; } else { umbral=umbral+30; }
-            img = controlador.Umbralizacion(myimg, umbral); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-    }//GEN-LAST:event_moreActionPerformed
-
-    private void lessActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lessActionPerformed
-        if ("modificar brillo".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (nivel_brillo-1 < -5) { nivel_brillo=-5; } else { nivel_brillo--; }
-            img = controlador.ModificarBrillo(myimg, nivel_brillo); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-        if ("modificar contraste".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (nivel_contraste-1 < -4) { nivel_contraste=-4; } else { nivel_contraste--; }
-            System.out.println(nivel_contraste);
-            img = controlador.ModificarContraste(myimg, nivel_contraste); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-        if ("umbralización".equals(global_case)) {
-            myimg = getImagenOriginal();
-            if (umbral-30<8) { umbral = 8; } else { umbral=umbral-30; }
-            img = controlador.Umbralizacion(myimg, umbral); // Se accede a la imagen desde el modelo.
-            imagenFinal = img.getScaledInstance(imagen.getWidth(), imagen.getHeight(), Image.SCALE_SMOOTH);
-            imagen.setIcon(new ImageIcon(imagenFinal));
-            Cuadro.add(imagen);
-            setImagenTemporal(img);
-        }
-    }//GEN-LAST:event_lessActionPerformed
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        kernel = jComboBox1.getSelectedItem().toString();
-    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -780,12 +357,13 @@ public class Frame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Cuadro;
-    private javax.swing.JButton guardarImagen;
     private javax.swing.JLabel imagen;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel imagen1;
+    private javax.swing.JLabel imagen2;
     private javax.swing.JToggleButton jToggleButton1;
-    private javax.swing.JButton less;
-    private javax.swing.JButton more;
-    private javax.swing.JComboBox<String> opcion;
+    private javax.swing.JToggleButton jToggleButton3;
+    private java.awt.Label label1;
+    private java.awt.Label label2;
+    private javax.swing.JLabel out;
     // End of variables declaration//GEN-END:variables
 }
